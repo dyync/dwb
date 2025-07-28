@@ -21,19 +21,14 @@ Current cmds:
 
 ## Minimum Requirements
 
-- At least 2 GB RAM (puppeteer)
 - Change 'config.js'
+- 2 GB RAM (chromium/puppeteer)
+
 
 ## Installation
 
 ```shell
 sudo apt-get install chromium-browser
-```
-or
-```shell
-sudo apt install wget
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
 
 ```shell
@@ -58,11 +53,9 @@ pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 
 ## Note
 
-In case you scrolled this far something is maybe not working :|
-
 - 'cookies.txt'
 ```shell
-You have to add own 'cookies.txt'. I left some cookies for you but they maybe won't work anymore (install browser add-on and go visit yt, it takes 5 sec)
+You have to add own 'cookies.txt'. I left some cookies for you but they probably won't work anymore. Just install any browser cookies.txt add-on and go visit yt, it takes 5 sec)
 ```
 
 - nodejs/express
@@ -81,7 +74,7 @@ npm -v
 ```
 
 on windows:
-just google for nodejs and download their .msi
+download nodejs .msi
 
 - Third party API's in 'config.js'
 For some of the modules you MAYBE need to register at third-party websites. So only in case you want to use EVERY @command (fe. @casino/@weather/@cc .. you need MongoDB, OpenAI, Coinbase, OpenWeather to save/get data/api token/url) don't worry they are all free. I made the code clean so you can understand/learn/modify easily (and make an even better bot)

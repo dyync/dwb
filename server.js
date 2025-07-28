@@ -119,6 +119,7 @@ app.post('/download', async (req, res) => {
         if (!url.match(/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/)) {
             return res.status(400).json({ error: 'Invalid YouTube URL' })
         }
+        url = url.split('&list=')[0]
         const useCookies = fs.existsSync(COOKIES_PATH)
         const timestamp = Date.now()
         const outputTemplate = path.join(DOWNLOAD_DIR, `%(title)s_${timestamp}.%(ext)s`)
