@@ -27,6 +27,16 @@ Current cmds:
 ## Installation
 
 ```shell
+sudo apt-get install chromium-browser
+```
+or
+```shell
+sudo apt install wget
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
+```
+
+```shell
 PUPPETEER_SKIP_DOWNLOAD=true npm i
 ```
 

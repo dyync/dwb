@@ -46,15 +46,17 @@ var quiz_active = false
 var quiz_solution = ''
 var quiz_answers = []
 
-
-mongoose.connect(config_data.mongodb).then(() => {
-  const store = new MongoStore({ mongoose: mongoose });
-})
+if(config_data.api_mongodb == 'yes') {
+  mongoose.connect(config_data.mongodb).then(() => {
+    const store = new MongoStore({ mongoose: mongoose });
+  })
+}
 
 
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
+      executablePath: '/usr/bin/google-chrome-stable',
       headless: true,
       args: ['--no-sandbox','--disable-setuid-sandbox']
   }
@@ -518,7 +520,7 @@ client.on('message', async message => {
   }
 
   //casino
-  if (command.startsWith('casino') || command.startsWith('gamble') ) {    
+  if (command.startsWith('casino') || command.startsWith('gamble') && config_data.api_mongodb == 'yes') {    
     var fruitArr = ['🍉','🍇','🍒','🍊','🍋','🥥','🌶']
     var winArr = []
     var winString = ""
