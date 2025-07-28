@@ -43,7 +43,7 @@ npm install -g pm2
 ```
 
 ```shell
-pm2 start index.js --name "swb" --cron-restart="0 3 * * *"
+pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 ```
 
 ## Note
