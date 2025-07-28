@@ -19,23 +19,6 @@ Current cmds:
     @ytmp4
 ```
 
-
-
-Note: 
-You have to add own 'cookies.txt'. I left some cookies for you but they probably won't work anymore when you read this (install browser add-on and go visit yt, it takes 5 sec)
-Obviously you need node for js
-nvm -v
-nvm install node
-nvm use node
-node -v
-npm install -g npm@latest
-sudo apt update && sudo apt upgrade -y
-(sudo reboot)
-npm -v
-
-
-
-
 ## Minimum Requirements
 
 - At least 2 GB RAM (puppeteer)
@@ -61,10 +44,6 @@ npm install -g pm2
 
 ```shell
 pm2 start index.js --name "swb" --cron-restart="0 3 * * *"
-```
-
-```shell
-pm2 start server.js --name "swb_s" --cron-restart="0 3 * * *"
 ```
 
 ## Note
