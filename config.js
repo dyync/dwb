@@ -6,8 +6,8 @@ module.exports = {
     crypto_default: 'BTC,ETH,LTC,XMR',
     openweather: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     zipcode: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
-    api_mongodb: 'yes',
-    api_openai: 'yes',
-    api_openweather: 'yes',
+    api_mongodb: 'no',
+    api_openai: 'no',
+    api_openweather: 'no',
     autodetect_youtube: 'yes',
 };
