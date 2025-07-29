@@ -39,7 +39,7 @@ async function openai(question) {
         return res_obj
 
     } catch (err) {
-        console.error(err);
+        console.log(err);
         res_obj['status'] = 500
         res_obj['question'] = question
         res_obj['answer'] = ''
@@ -82,7 +82,7 @@ async function openai_image(question) {
         return res_obj
 
     } catch (err) {
-        console.error(err);
+        console.log(err);
         res_obj['status'] = 500
         res_obj['question'] = question
         res_obj['answer'] = ''

@@ -40,7 +40,7 @@ async function ebay_first_page(item,tld) {
             return found_prices
     })
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return found_prices
   } 
 }
@@ -82,7 +82,7 @@ async function sold_ebay_first_page(item,tld) {
             return found_prices
     })
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return found_prices
   } 
 }
@@ -111,10 +111,10 @@ async function ebay(item) {
   res_obj['min_price'] = Math.min(...ebay_res_prices).toString()
   res_obj['max_price'] = Math.max(...ebay_res_prices).toString()
   res_obj['avg_price'] = ebay_res_prices_average.toFixed(2)
-  res_obj['tld'] = ebay_tld
+  res_obj['tld'] = tld
   res_obj['currency'] = ebay_currency
-  res_obj['url'] = `https://www.ebay.${ebay_tld}/sch/i.html?_nkw=${item_no_space}`
-  res_obj['sold_url'] = `https://www.ebay.${ebay_tld}/sch/i.html?_nkw=${item_no_space}`
+  res_obj['url'] = `https://www.ebay.${tld}/sch/i.html?_nkw=${item_no_space}`
+  res_obj['sold_url'] = `https://www.ebay.${tld}/sch/i.html?_nkw=${item_no_space}&LH_Complete=1&LH_Sold=1`
 
 
   console.log(`getting only sold items .. `)

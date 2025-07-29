@@ -37,7 +37,7 @@ async function getCrypto(token,cur) {
                 res_obj['status'] = 401
                 res_obj['token_price'] = '0 (err)'
                 res_obj['token_currency'] = 'None (err)'
-                console.error(err);
+                console.log(err);
             } 
             return res_obj
         })

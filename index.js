@@ -74,7 +74,7 @@ client.on('authenticated', () => {
 });
 
 client.on('auth_failure', message => {
-  console.err('AUTHENTICATION FAILURE', message);
+  console.log('AUTHENTICATION FAILURE', message);
 });
 
 client.on('ready', () => {
@@ -143,7 +143,7 @@ client.on('message', async message => {
           })
           return response.data
       } catch (err) {
-          console.err(err)
+          console.log(err)
           throw err
       }
   }
@@ -154,7 +154,7 @@ client.on('message', async message => {
       try {
           client.sendMessage(message.from, 'Hello! Bot online :)');
       } catch (err) {
-          console.err(err)
+          console.log(err)
       }
   }  
 
@@ -336,7 +336,7 @@ client.on('message', async message => {
               bedingungen = res.text
         }).catch(err => {
             client.sendMessage(message.from, `wetter translate err ${err}`);
-            console.err("@wetter translate err: " + err);
+            console.log("@wetter translate err: " + err);
         });
         client.sendMessage(message.from, `*Wetter für ${data.place}*\n` 
                                     + "\n*Temp:* "+ data.current_temp + " °C"  
@@ -566,33 +566,6 @@ client.on('message', async message => {
           })  
     }
   }
-
-  if (command.startsWith('reset ls')) {
-      if (hasQuotedMsg) {
-        user_to_reset = message.to
-      }
-      var user_to_reset = arg.split("ls ")[1]        
-      mgdb_m.mgdb_del(user_to_reset)
-      .then(id_obj => {
-        client.sendMessage(message.from, `${user_to_reset}s points deleted`) 
-      })
-      .catch(err => {
-        console.log("[@reset ls] err:" + err)
-      })
-  }
-  if (command.startsWith('set ls')) {
-      var name_ls_string = arg.split("ls ")[1]
-      var username = name_ls_string.split(" ")[0]
-      var ls = name_ls_string.split(" ")[1]        
-      mgdb_m.mgdb_set(username,ls)
-      .then(id_obj => {
-        client.sendMessage(message.from, `${username}s points set to ${ls}`) 
-      })
-      .catch(err => {
-        console.log("[@set ls] err:" + err)
-      })
-  }
-
   //wiki
   if (command.startsWith('wiki')) {
     let wiki_result = await wiki.wiki(arg)

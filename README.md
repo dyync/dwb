@@ -2,22 +2,7 @@
 
 Multifunction WhatsApp Bot based on [pedroslopez whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
 
-Current cmds:
-```shell
-    @translate
-    @wiki
-    @urban
-    @imdb
-    @ebay
-    @crypto
-    @chatgpt
-    @dalle
-    @wetter
-    @quiz
-    @casino
-    @ytmp3
-    @ytmp4
-```
+
 
 ## Minimum Requirements
 
@@ -49,6 +34,24 @@ npm install -g pm2
 
 ```shell
 pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
+```
+
+
+Current cmds:
+```shell
+    @translate <text>[ <from> <to>])
+    @wiki <text>
+    @urban <text>
+    @imdb <text>
+    @ebay <text>
+    @crypto <token>
+    @chatgpt <text>
+    @dalle <text>
+    @wetter <text>
+    @quiz
+    @casino
+    @mp3 <yt-link>
+    @mp4 <yt-link>
 ```
 
 ## Note

@@ -33,7 +33,7 @@ async function imdb_find_titles(moviename) {
             return found_titles
     })
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return found_titles
   } 
 }
@@ -60,7 +60,7 @@ async function imdb_info(url) {
                     'text' : imdb_text}
     })
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return {'rating' : '',
             'text' : ''}
   } 
