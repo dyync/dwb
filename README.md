@@ -39,31 +39,27 @@ pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 
 Current cmds:
 ```shell
-    @translate <text>[ <from> <to>])
+    @translate <text>[ <from> <to>]
     @wiki <text>
     @urban <text>
     @imdb <text>
     @ebay <text>
-    @crypto <token>
-    @chatgpt <text>
-    @dalle <text>
-    @wetter <text>
-    @quiz
-    @casino
-    @mp3 <yt-link>
-    @mp4 <yt-link>
+    @crypto <token> | 3rd party API
+    @chatgpt <text> | 3rd party API
+    @dalle <text>   | 3rd party API
+    @wetter <text>  | 3rd party API
+    @quiz           | mongodb
+    @casino         | mongodb
+    @mp3 <yt-link>  | cookies.txt
+    @mp4 <yt-link>  | cookies.txt
 ```
 
 ## Note
 
 - 'cookies.txt'
-```shell
-You have to add own 'cookies.txt'. I left some cookies for you but they probably won't work anymore. Just install any browser cookies.txt add-on and go visit yt, it takes 5 sec)
-```
+You have to add own 'cookies.txt'. I left some cookies for you but they probably won't work 
 
 - nodejs/express
-Obviously you need node for js and npm for js packages
-
 on ubuntu:
 ```shell
 nvm -v
@@ -78,6 +74,3 @@ npm -v
 
 on windows:
 download nodejs .msi
-
-- Third party API's in 'config.js'
-For some of the modules you MAYBE need to register at third-party websites. So only in case you want to use EVERY @command (fe. @casino/@weather/@cc .. you need MongoDB, OpenAI, Coinbase, OpenWeather to save/get data/api token/url) don't worry they are all free. I made the code clean so you can understand/learn/modify easily (and make an even better bot)
