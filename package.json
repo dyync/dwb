@@ -3,8 +3,8 @@
   "version": "0.0.3",
   "main": "index.js",
   "scripts": {
-    "start": "node -e \"const config = require('./config.js'); require('./index.js'); if (config.run_server !== false) require('./server.js');\"",
-    "postinstall": "sudo apt install -y chromium-browser && playwright install --with-deps chromium"
+    "start": "node -e \"const config = require('./config.js'); require('./index.js'); if (config.run_server) require('./server.js');\"",
+    "postinstall": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "axios": "^1.10.0",

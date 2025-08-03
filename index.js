@@ -46,7 +46,7 @@ var quiz_active = false
 var quiz_solution = ''
 var quiz_answers = []
 
-if(config_data.api_mongodb == 'yes') {
+if(config_data.api_mongodb) {
   mongoose.connect(config_data.mongodb).then(() => {
     const store = new MongoStore({ mongoose: mongoose });
   })
@@ -490,7 +490,7 @@ client.on('message', async message => {
     quiz_active = true
     await new Promise(resolve => setTimeout(resolve, 30000))
     client.sendMessage(message.from, `*Quiz solution*\n${data.antwort}`)
-    if(config_data.api_mongodb == 'yes') {
+    if(config_data.api_mongodb) {
       for(let qi = 0;qi < quiz_answers.length;qi++) {
         if(quiz_answers[qi]['correct']) {
           liegestuetzen = 20
@@ -521,51 +521,42 @@ client.on('message', async message => {
   }
 
   //casino
-  if (command.startsWith('casino') || command.startsWith('gamble') && config_data.api_mongodb == 'yes') {    
-    var fruitArr = ['🍉','🍇','🍒','🍊','🍋','🥥','🌶']
-    var winArr = []
-    var winString = ""
-    var liegestuetzen = 0
+  if (command.startsWith('casino') || command.startsWith('gamble')) {    
+    let fruitArr = ['🍉','🍇','🍒','🍊','🍋','🥥','🌶']
+    let winArr = []
+    let winString = ""
+    let score = 0
     for(i=1;i<=3;i++) {
-      var n = Math.floor(Math.random()*fruitArr.length)
+      let n = Math.floor(Math.random()*fruitArr.length)
       winArr.push(n)
       if(i<3) {
         winString += `|${fruitArr[n]}`
       } else {
         winString += `|${fruitArr[n]}|`              
       }
-    }  
+    } 
+
     if(winArr[0] == winArr[1] && winArr[0] !== winArr[2]) {
-      liegestuetzen = 20
-      mgdb_m.mgdb(author,liegestuetzen)
+      score = 20
+    } else if (winArr[0] == winArr[1] && winArr[0] == winArr[2]) {
+        score = 50
+    } else {
+        score = -5
+    }
+
+    if(config_data.api_mongodb) {
+      mgdb_m.mgdb(author,score)
           .then(id_obj => {
-            var lsjz = parseInt(id_obj.liegestuetzen) + 20
-            client.sendMessage(message.from, `${winString} \n+20 points!\n${notifyName}'s total: ${lsjz}`) 
+            var lsjz = parseInt(id_obj.score) + 20
+            client.sendMessage(message.from, `${winString} \n${score} points!\n${notifyName}'s total: ${lsjz}`) 
           })
           .catch(err => {
             console.log("[@casino] err(1):" + err)
-          })              
-    } else if (winArr[0] == winArr[1] && winArr[0] == winArr[2]) { 
-        liegestuetzen = 50
-        mgdb_m.mgdb(author,liegestuetzen)
-          .then(id_obj => {
-            var lsjz = parseInt(id_obj.liegestuetzen) + 50
-            client.sendMessage(message.from, `${winString} \n+50 points!\n${notifyName}'s total: ${lsjz}`) 
-          })
-          .catch(err => {
-            console.log("[@casino] err(2):" + err)
           }) 
     } else {
-        liegestuetzen = -5
-        mgdb_m.mgdb(author,liegestuetzen)
-          .then(id_obj => {
-            var lsjz = parseInt(id_obj.liegestuetzen) - 5
-            client.sendMessage(message.from, `${winString} \n-5 points!\n${notifyName}'s total: ${lsjz}`) 
-          })
-          .catch(err => {
-            console.log("[@casino] err(3):" + err)
-          })  
+      client.sendMessage(message.from, `${winString} \n${score} points!`) 
     }
+
   }
   //wiki
   if (command.startsWith('wiki')) {
