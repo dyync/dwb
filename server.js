@@ -205,18 +205,6 @@ app.get('/downloads/:asd', (req, res) => {
 
 
 
-app.post('/cook', (req, res) => {
-    if (!req.files || !req.files.cookies) {
-        return res.status(400).json({ error: 'No cookies file uploaded' })
-    }
-    const cookiesFile = req.files.cookies
-    cookiesFile.mv(COOKIES_PATH, (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Failed to save cookies file' })
-        }
-        res.json({ message: 'Cookies file uploaded successfully' })
-    })
-})
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
@@ -225,5 +213,4 @@ app.listen(PORT, () => {
     console.log(`Available endpoints:`)
     console.log(`- /hello (GET)`)
     console.log(`- /download (POST)`)
-    console.log(`- /cook (POST cookies.txt mbmbn)`)
 })
