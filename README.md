@@ -13,10 +13,6 @@ Multifunction WhatsApp Bot based on [pedroslopez whatsapp-web.js](https://github
 ## Installation
 
 ```shell
-sudo apt-get install chromium-browser
-```
-
-```shell
 PUPPETEER_SKIP_DOWNLOAD=true npm i
 ```
 
@@ -93,6 +89,9 @@ sudo apt update && sudo apt install ffmpeg -y
 # 4. Verify installation
 yt-dlp --version
 
-# 5. 'cookies.txt'
-Add own 'cookies.txt'. I left some cookies for test but they probably won't work. You can get them with any 'cookies.txt' browser extension.
+# 5. Install FFmpeg (required for audio/video merging)
+Add own "cookies.txt". I left some but they probably wont gone bad. You can get new cookies with any "cookies.txt" browser extension/add-on.
+
+# 6. Chromium (maybe chromium install failed)
+sudo apt-get install chromium-browser
 ```
