@@ -595,7 +595,7 @@ client.on('message', async message => {
 
 
 
-  if (config_data.autodetect_youtube == 'yes' && !message.body.includes('@')) {
+  if(config_data.autodetect_youtube && !message.body.includes('@')) {
     if (message.body.includes('youtu.be/') || message.body.includes('youtube.com/watch?v=')) {
         try {
             let msg_req_link = `${message.body}`

@@ -8,9 +8,9 @@ module.exports = {
     crypto_default: 'BTC,ETH,LTC,XMR',
     openweather: '1822ef1ce5740ef0e03fdbaef1ac4ad0',
     zipcode: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
-    api_mongodb: 'no',
-    api_openai: 'no',
-    api_openweather: 'no',
-    autodetect_youtube: 'yes',
+    api_mongodb: false,
+    api_openai: false,
+    api_openweather: false,
+    autodetect_youtube: true,
     run_server: true
 };
