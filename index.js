@@ -16,12 +16,12 @@ const ebay = require('./modules/ebay')
 const openai = require('./modules/openai')
 const crypto = require('./modules/crypto')
 const urban = require('./modules/urban')
-const config_data = require('./config.js');
+const config_data = require('./config.js')
 
 
 
 
-var networkInterfaces = os.networkInterfaces();
+var networkInterfaces = os.networkInterfaces()
 const host_ip = networkInterfaces['eth0'][0]['address']
 host_address = `http://${host_ip}:3000`
 server_address = `http://${host_ip}:3333`
@@ -48,7 +48,7 @@ var quiz_answers = []
 
 if(config_data.api_mongodb) {
   mongoose.connect(config_data.mongodb).then(() => {
-    const store = new MongoStore({ mongoose: mongoose });
+    const store = new MongoStore({ mongoose: mongoose })
   })
 }
 
@@ -60,26 +60,26 @@ const client = new Client({
       headless: true,
       args: ['--no-sandbox','--disable-setuid-sandbox']
   }
-});
+})
 
 client.initialize();  
 
 client.on('qr', (qr) => {
   console.log('QR RECEIVED', qr);
   qrcode.generate(qr, {small: true});
-});
+})
 
 client.on('authenticated', () => {
   console.log('AUTHENTICATED');
-});
+})
 
 client.on('auth_failure', message => {
   console.log('AUTHENTICATION FAILURE', message);
-});
+})
 
 client.on('ready', () => {
   console.log('DYNCOO BOT ONLINE!');
-});
+})
 
 
 client.on('message', async message => {
@@ -152,12 +152,11 @@ client.on('message', async message => {
 
   if (message.body === 'Hi') {
       try {
-          client.sendMessage(message.from, 'Hello! Bot online :)');
+          client.sendMessage(message.from, 'Hello! Bot online :)')
       } catch (err) {
           console.log(err)
       }
   }  
-
 
   if (command.startsWith('cmd') || command.startsWith('info') || command.startsWith('?')) {
     client.sendMessage(message.from, `Commands` 
@@ -167,8 +166,6 @@ client.on('message', async message => {
     + `\n@imdb`
     + `\n@ebay`
     + `\n@crypto`
-    + `\n@chatgpt`
-    + `\n@dalle`
     + `\n@wetter`
     + `\n@quiz`
     + `\n@casino`
@@ -214,8 +211,8 @@ client.on('message', async message => {
         }
         return client.sendMessage(message.from, "err getting an OpenAI ChatGPT response") 
       }
-      let media = await MessageMedia.fromUrl(res_openai_data.answer);
-      client.sendMessage(message.from, media);
+      let media = await MessageMedia.fromUrl(res_openai_data.answer)
+      client.sendMessage(message.from, media)
     } catch(err){
       return client.sendMessage(message.from, `err getting ChatGPT for '${arg}'`)
     }
@@ -270,7 +267,7 @@ client.on('message', async message => {
       + `\n${res_ebay_data.url}`
       + `\nSold: ${res_ebay_data.sold_url}`)
     } catch(err){
-      console.log("[@ebay] try catch ERR..." + err);
+      console.log("[@ebay] try catch ERR..." + err)
       return client.sendMessage(message.from, `err getting eBay for '${arg}'`)
     }
   }
@@ -295,7 +292,7 @@ client.on('message', async message => {
         + `\n${res_urban_data.url}`)
       }
     } catch(err){
-      console.log("[@urban] try catch ERR..." + err);
+      console.log("[@urban] try catch ERR..." + err)
       return client.sendMessage(message.from, `err connecting to Urban Dictionary for '${arg}'`)
     }
   }
@@ -312,7 +309,7 @@ client.on('message', async message => {
       client.sendMessage(message.from, `crypto (buy price)\n` 
       + res_str)    
     } catch(err){
-      console.log("@crypto]  try catch ERR..." + err);
+      console.log("@crypto]  try catch ERR..." + err)
       return client.sendMessage(message.from, `err getting current crypto price`)
     }
   }
@@ -326,7 +323,7 @@ client.on('message', async message => {
     } else if (arg.match(buchstabe)) {
       var data = await wetter.stadtWetter(arg)
     } else {
-      client.sendMessage(message.from, 'Stadt ' + arg + ' nicht gefunden');
+      client.sendMessage(message.from, 'Stadt ' + arg + ' nicht gefunden')
     }
     if (data == "err") {
         client.sendMessage(message.from, `Stadt/PLZ '${arg}' nicht gefunden!`)
@@ -335,8 +332,8 @@ client.on('message', async message => {
         await translate(data.current_observation, {to: default_lang}).then(res => {
               bedingungen = res.text
         }).catch(err => {
-            client.sendMessage(message.from, `wetter translate err ${err}`);
-            console.log("@wetter translate err: " + err);
+            client.sendMessage(message.from, `wetter translate err ${err}`)
+            console.log("@wetter translate err: " + err)
         });
         client.sendMessage(message.from, `*Wetter für ${data.place}*\n` 
                                     + "\n*Temp:* "+ data.current_temp + " °C"  
@@ -344,7 +341,7 @@ client.on('message', async message => {
                                     + "\n*Min Temp:* " + data.temp_min + " °C"
                                     + "\n*Max Temp:* " + data.temp_max + " °C"
                                     + "\n*Luftfeuchtigkeit:* " + data.current_humidity + "%" 
-                                    + "\n*Windstärke:* " + data.current_wind);
+                                    + "\n*Windstärke:* " + data.current_wind)
     }
   }
 
@@ -364,7 +361,7 @@ client.on('message', async message => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
                 client.sendMessage(message.from, "err translating")
-            });
+            })
         } else if(valid_langs.includes(translate_msg_arr[1])) {
           return client.sendMessage(message.from, `(1)Please enter text to translate to ${translate_msg_arr[1]}. \n\nUse translate like this -> \n@tr (<from-language> <to-language>) <text>`)
         } else {
@@ -378,7 +375,7 @@ client.on('message', async message => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
                 client.sendMessage(message.from, "err(2) translating. Check @cmds")
-            });
+            })
         }
         if(valid_langs.includes(translate_msg_arr[1])) {
           if(valid_langs.includes(translate_msg_arr[2])) {
@@ -391,7 +388,7 @@ client.on('message', async message => {
                   client.sendMessage(message.from, res.text)
               }).catch(err => {
                   client.sendMessage(message.from, "err(3) translating. Check @cmds")
-              });  
+              })
             } else {
               translate_msg_split = translate_msg_arr.splice(2)
               req_text = translate_msg_split.join(' ')
@@ -399,7 +396,7 @@ client.on('message', async message => {
                   client.sendMessage(message.from, res.text)
               }).catch(err => {
                   client.sendMessage(message.from, "err(4) translating. Check @cmds")
-              });
+              })
             }
           }
         } else {
@@ -410,7 +407,7 @@ client.on('message', async message => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
                 client.sendMessage(message.from, "err(5) translating. Check @cmds")
-            });
+            })
         }
       }                    
       else if(translate_msg_arr.length > 3) {
@@ -422,7 +419,7 @@ client.on('message', async message => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
                 client.sendMessage(message.from, "err(6) translating. Check @cmds")
-            });
+            })
           } else {  
               if(translate_msg_arr[1] == default_lang) { 
                 translate_msg_split = translate_msg_arr.splice(2)
@@ -431,7 +428,7 @@ client.on('message', async message => {
                     client.sendMessage(message.from, res.text)
                 }).catch(err => {
                     client.sendMessage(message.from, "err(7) translating. Check @cmds")
-                });  
+                })
               } else {
                 translate_msg_split = translate_msg_arr.splice(2)
                 req_text = translate_msg_split.join(' ')
@@ -439,7 +436,7 @@ client.on('message', async message => {
                     client.sendMessage(message.from, res.text)
                 }).catch(err => {
                     client.sendMessage(message.from, "err(8) translating. Check @cmds")
-                });
+                })
               }
           }              
         } else {
@@ -449,7 +446,7 @@ client.on('message', async message => {
               client.sendMessage(message.from, res.text)
           }).catch(err => {
               client.sendMessage(message.from, "err(9) translating. Check @cmds")
-          });
+          })
         }
       } else {
         client.sendMessage(message.from, "err(10) translating. Check @cmds")
@@ -482,7 +479,6 @@ client.on('message', async message => {
 
   //quiz
   if (command.startsWith('quiz') || command.startsWith('q')) {
-
     var data = await quiz.quiz()
     quiz_solution = data.antwort
     quiz_solution_arr = data.antwort.toLowerCase().split(" ")
@@ -490,29 +486,40 @@ client.on('message', async message => {
     quiz_active = true
     await new Promise(resolve => setTimeout(resolve, 30000))
     client.sendMessage(message.from, `*Quiz solution*\n${data.antwort}`)
-    if(config_data.api_mongodb) {
-      for(let qi = 0;qi < quiz_answers.length;qi++) {
-        if(quiz_answers[qi]['correct']) {
-          liegestuetzen = 20
-          mgdb_m.mgdb(author,liegestuetzen)
-              .then(id_obj => {
-                var lsjz = parseInt(id_obj.liegestuetzen) + 20
-                client.sendMessage(message.from, `${notifyName} is correct +20 points! total: ${lsjz}`)
-              })
-              .catch(err => {
-                console.log("[@quiz] err(1):" + err)
-              })   
+    if (config_data.api_mongodb) {
+      for (let qi = 0; qi < quiz_answers.length; qi++) {
+        if (quiz_answers[qi]['correct']) {
+          points = 20;
+          mgdb_m.mgdb(author, points)
+            .then(id_obj => {
+              var lsjz = parseInt(id_obj.points) + 20
+              client.sendMessage(message.from, `${notifyName} is correct +20 points! total: ${lsjz}`)
+            })
+            .catch(err => {
+              console.log("[@quiz] err(1):" + err)
+            })
         }
-        if(quiz_answers[qi]['subcorrect']) {
-          liegestuetzen = 5
-          mgdb_m.mgdb(author,liegestuetzen)
-              .then(id_obj => {
-                var lsjz = parseInt(id_obj.liegestuetzen) + 5
-                client.sendMessage(message.from, `${notifyName} is partly correct +5 points! ${notifyName}'s total: ${lsjz}`)
-              })
-              .catch(err => {
-                console.log("[@quiz] err(2):" + err)
-              })   
+        if (quiz_answers[qi]['subcorrect']) {
+          points = 5
+          mgdb_m.mgdb(author, points)
+            .then(id_obj => {
+              var lsjz = parseInt(id_obj.points) + 5
+              client.sendMessage(message.from, `${notifyName} is partly correct +5 points! ${notifyName}'s total: ${lsjz}`)
+            })
+            .catch(err => {
+              console.log("[@quiz] err(2):" + err)
+            })
+        }
+      }
+    } else {
+      for (let qi = 0; qi < quiz_answers.length; qi++) {
+        if (quiz_answers[qi]['correct']) {
+          points = 20
+          client.sendMessage(message.from, `${notifyName} is correct +${points} points!`);
+        }
+        if (quiz_answers[qi]['subcorrect']) {
+          points = 5
+          client.sendMessage(message.from, `${notifyName} is partly correct +${points} points!`)
         }
       }
     }
@@ -613,24 +620,24 @@ client.on('message', async message => {
                   // https://github.com/pedroslopez/whatsapp-web.js/issues/3657
 
                   try {
-                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`);
+                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
                       await client.sendMessage(message.from, media, { 
                         sendMediaAsDocument: true
                       })
-                      console.log("Video sent successfully");
+                      console.log("Video sent successfully")
                   } catch (err) {
                       console.log(`autodetect err 1: ${err}`)
-                      client.sendMessage(message.from, `autodetect err 1 ${err}`);
+                      client.sendMessage(message.from, `autodetect err 1 ${err}`)
                   }
               })
               .catch(err => {
                 console.log(`autodetect err 2: ${err}`)
-                client.sendMessage(message.from, `autodetect err 2 ${err}`);
+                client.sendMessage(message.from, `autodetect err 2 ${err}`)
               })
 
         } catch (err) {
             console.log(`autodetect err 3: ${err}`)
-            client.sendMessage(message.from, `autodetect err 3 ${err}`);
+            client.sendMessage(message.from, `autodetect err 3 ${err}`)
         }
     } 
   } 
@@ -651,24 +658,24 @@ client.on('message', async message => {
                   console.log(`res_size_mb         : ${res_size_mb}`)
 
                   try {
-                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`);
+                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
                       await client.sendMessage(message.from, media, { 
                         sendMediaAsDocument: true
                       })
-                      console.log("Video sent successfully");
+                      console.log("Video sent successfully")
                   } catch (err) {
                       console.log(`ytmp3 err 1: ${err}`)
-                      client.sendMessage(message.from, `ytmp3 err 1 ${err}`);
+                      client.sendMessage(message.from, `ytmp3 err 1 ${err}`)
                   }
               })
               .catch(err => {
                 console.log(`ytmp3 err 2: ${err}`)
-                client.sendMessage(message.from, `ytmp3 err 2 ${err}`);
+                client.sendMessage(message.from, `ytmp3 err 2 ${err}`)
               })
 
         } catch (err) {
             console.log(`ytmp3 err 3: ${err}`)
-            client.sendMessage(message.from, `ytmp3 err 3 ${err}`);
+            client.sendMessage(message.from, `ytmp3 err 3 ${err}`)
         }
   }
 
@@ -687,24 +694,24 @@ client.on('message', async message => {
                   console.log(`res_size_mb         : ${res_size_mb}`)
 
                   try {
-                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`);
+                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
                       await client.sendMessage(message.from, media, { 
                         sendMediaAsDocument: true
                       })
-                      console.log("Video sent successfully");
+                      console.log("Video sent successfully")
                   } catch (err) {
                       console.log(`ytmp4 err 1: ${err}`)
-                      client.sendMessage(message.from, `ytmp4 err 1 ${err}`);
+                      client.sendMessage(message.from, `ytmp4 err 1 ${err}`)
                   }
               })
               .catch(err => {
                 console.log(`ytmp4 err 2: ${err}`)
-                client.sendMessage(message.from, `ytmp4 err 2 ${err}`);
+                client.sendMessage(message.from, `ytmp4 err 2 ${err}`)
               })
 
         } catch (err) {
             console.log(`ytmp4 err 3: ${err}`)
-            client.sendMessage(message.from, `ytmp4 err 3 ${err}`);
+            client.sendMessage(message.from, `ytmp4 err 3 ${err}`)
         }
   }
 })

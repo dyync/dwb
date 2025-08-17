@@ -39,8 +39,6 @@ Current cmds:
     @imdb <text>
     @ebay <text>
     @crypto <token> | 3rd party API
-    @chatgpt <text> | 3rd party API
-    @dalle <text>   | 3rd party API
     @wetter <text>  | 3rd party API
     @quiz           | mongodb
     @casino         | mongodb

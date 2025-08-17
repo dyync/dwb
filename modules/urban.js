@@ -18,36 +18,36 @@ async function urban(term) {
         url: `https://api.urbandictionary.com/v0/define?term=${term}`
     }
 
-    let urban_res_obj = {}
+    let urban_res_obj = {};
 
-    return axios(mainconfig)
-        .then(async function(response) {            
-            let data = response.data
-            try {
-                for(u_def_i in data['list']) {
-                    data['list'][u_def_i]['definition'] = data['list'][u_def_i]['definition'].replace(/[\[\]']+/g,'')
-                }
-            } catch (urban_replace_err) {
-                console.log('[!urban] urban_replace_err: ' + urban_replace_err)
+    try {
+        const response = await axios(mainconfig);
+        let data = response.data;
+        
+        try {
+            for(let u_def_i in data['list']) {
+                data['list'][u_def_i]['definition'] = data['list'][u_def_i]['definition'].replace(/[\[\]']+/g,'');
             }
-            urban_res_obj['status'] = 200
-            urban_res_obj['term'] = term
-            urban_res_obj['defs'] = data['list']
-            urban_res_obj['url'] = `https://www.urbandictionary.com/define.php?term=${term}`
+        } catch (urban_replace_err) {
+            console.log('[!urban] urban_replace_err: ' + urban_replace_err);
+        }
+        
+        urban_res_obj['status'] = 200;
+        urban_res_obj['term'] = term;
+        urban_res_obj['defs'] = data['list'];
+        urban_res_obj['url'] = `https://www.urbandictionary.com/define.php?term=${term}`;
 
-            return urban_res_obj
-        })
-        .catch(function(error) {
-            urban_res_obj['status'] = 404
-            urban_res_obj['term'] = term
-            urban_res_obj['defs'] = [`No definition found for '${term}'`]
-            urban_res_obj['url'] = `https://www.urbandictionary.com/define.php?term=${term}`
+        return urban_res_obj;
+    } catch (error) {
+        urban_res_obj['status'] = 404;
+        urban_res_obj['term'] = term;
+        urban_res_obj['defs'] = [`No definition found for '${term}'`];
+        urban_res_obj['url'] = `https://www.urbandictionary.com/define.php?term=${term}`;
 
-            console.log('[!urban] error: ' + error)
-            return urban_res_obj
-        })
+        console.log('[!urban] error: ' + error);
+        return urban_res_obj;
+    }
 }
-
 
 module.exports = {
     urban    
