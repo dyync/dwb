@@ -13,11 +13,12 @@ const wiki = require('./modules/wiki')
 const quiz = require('./modules/quiz')
 const imdb = require('./modules/imdb')
 const ebay = require('./modules/ebay')
+const ai = require('./modules/ai')
 const openai = require('./modules/openai')
 const crypto = require('./modules/crypto')
 const urban = require('./modules/urban')
 const config_data = require('./config.js')
-
+const char_maps = require('./utils.js')
 
 
 
@@ -42,9 +43,12 @@ console.log(`************************`)
 const default_lang = 'en'
 const valid_langs = ['af', 'ak', 'am', 'ar', 'as', 'ay', 'az', 'be', 'bg', 'bho', 'bm', 'bn', 'bs', 'ca', 'ceb', 'ckb', 'co', 'cs', 'cy', 'da', 'de', 'doi', 'dv', 'ee', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fil', 'fr', 'fy', 'ga', 'gd', 'gl', 'gn', 'gom', 'gu', 'ha', 'haw', 'he', 'hi', 'hmn', 'hr', 'ht', 'hu', 'hy', 'id', 'ig', 'ilo', 'is', 'it', 'iw', 'ja', 'jv', 'jw', 'ka', 'kk', 'km', 'kn', 'ko', 'kri', 'ku', 'ky', 'la', 'lb', 'lg', 'ln', 'lo', 'lt', 'lus', 'lv', 'mai', 'mg', 'mi', 'mk', 'ml', 'mn', 'mni-Mtei', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'no', 'nso', 'ny', 'om', 'or', 'pa', 'pl', 'ps', 'pt', 'qu', 'ro', 'ru', 'rw', 'sa', 'sd', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'st', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vi', 'xh', 'yi', 'yo', 'zh', 'zh-CN', 'zh-TW', 'zu']
 
-var quiz_active = false
-var quiz_solution = ''
-var quiz_answers = []
+var active_quiz = false
+var active_quiz_solution = ''
+var active_quiz_answers = []
+var active_typeracer = false
+var active_typeracer_timestamp = 0
+var active_typeracer_racers = []
 
 if(config_data.api_mongodb) {
   mongoose.connect(config_data.mongodb).then(() => {
@@ -122,20 +126,18 @@ client.on('message', async message => {
   console.log(`hasQuotedMsg: ${hasQuotedMsg}`)
   console.log(`*************************`)
 
-  async function fn_download(req_link, req_format, req_type) {
+  async function fn_download(req_link, req_format) {
       console.log(`*************************`)
       console.log(`req_link  : ${req_link}`)
       console.log(`req_format: ${req_format}`)
-      console.log(`req_type  : ${req_type}`)
       console.log(`*************************`)
       try {
           const response = await axios({
               method: 'post',
               url: `${server_address}/download`,
               data: {
-                  'url': req_link,
-                  'format': req_format,
-                  'type': req_type
+                  'link': req_link,
+                  'format': req_format
               },
               headers: {
                   'Content-Type': 'application/json'
@@ -158,6 +160,7 @@ client.on('message', async message => {
       }
   }  
 
+  // cmds
   if (command.startsWith('cmd') || command.startsWith('info') || command.startsWith('?')) {
     client.sendMessage(message.from, `Commands` 
     + `\n@translate`
@@ -173,53 +176,54 @@ client.on('message', async message => {
     + `\n@ytmp4`)
   }
 
-  //chatgpt
-  if (command.startsWith('openai') || command.startsWith('oai') || command.startsWith('ai') || command.startsWith('gpt') || command.startsWith('cgpt') || command.startsWith('chatgpt')) {
+  // ai
+  if (command.startsWith('ai') || command.startsWith('vllm') ) {
+
+    if(arg <= 1) {
+      return client.sendMessage(message.from, "Use ai like this -> @ai <question>")        
+    }
+
+    try {
+          const res_ai = await ai.vllm(arg);
+          if(res_ai['status'] == 200) {
+            return client.sendMessage(message.from, `*AI* result *'${arg}'*` 
+                                                    + `\n${res_ai['answer'].trim()}`)
+            
+
+          } else {
+            return client.sendMessage(message.from, `AI err 500`)
+          }
+    } catch(err){
+        return client.sendMessage(message.from, `AI offline/connection issue ${err}`)
+    }
+  }
+
+  // image
+  if (command.startsWith('image') || command.startsWith('picture')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use chatgpt like this -> @gpt <question>")        
     }
 
     try {
-      let res_openai_data = await openai.openai(arg)
-      if(res_openai_data.status !== 200) {
-        if (res_openai_data.status == 500) {
-          return client.sendMessage(message.from, `Could not get response for OpenAI ChatGPT question '${arg}' (500)`) 
-        }
-        return client.sendMessage(message.from, "err getting an OpenAI ChatGPT response") 
+      const test2 = await ai.image(arg);
+      console.log(`\nTest status: ${test2['status']}`);
+      console.log(`\nTest answer: ${test2['answer']}`);
+      if(test2['status'] == 200) {
+        console.log(`\nresult == 200 returning answer`)
+        let media = await MessageMedia.fromUrl(test2['answer'])
+        client.sendMessage(message.from, media)
+      } else {
+        console.log(`\nstatus is not 200 ... meh returning bla image`);
+        return client.sendMessage(message.from, "bla image")
       }
-      client.sendMessage(message.from, `OpenAI ChatGPT` 
-        + `\n*'${res_openai_data.question}'*`
-        + `\n${res_openai_data.answer.trim()}`)
     } catch(err){
-      return client.sendMessage(message.from, `err getting ChatGPT for '${arg}'`)
+      return client.sendMessage(message.from, `err nai9_image '${arg}'`)
     }
   }
 
-  //dall-e
-  if (command.startsWith('dalle') || command.startsWith('picture') || command.startsWith('gptpicture') || command.startsWith('machbild')) {
-
-    if(arg <= 1) {
-      return client.sendMessage(message.from, "Use chatgpt like this -> @gpt <question>")        
-    }
-
-    try {
-      let res_openai_data = await openai.openai_image(arg)
-      if(res_openai_data.status !== 200) {
-        if (res_openai_data.status == 500) {
-          return client.sendMessage(message.from, `Could not get response for OpenAI ChatGPT question '${arg}' (500)`) 
-        }
-        return client.sendMessage(message.from, "err getting an OpenAI ChatGPT response") 
-      }
-      let media = await MessageMedia.fromUrl(res_openai_data.answer)
-      client.sendMessage(message.from, media)
-    } catch(err){
-      return client.sendMessage(message.from, `err getting ChatGPT for '${arg}'`)
-    }
-  }
-
-  //imdb
-  if (command.startsWith('imdb') || command.startsWith('i') || command.startsWith('movie')) {
+  // imdb
+  if (command.startsWith('imdb') || command.startsWith('movie')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use IMDb like this -> @imdb <movie title>")        
@@ -243,8 +247,8 @@ client.on('message', async message => {
     }
   }
 
-  //ebay
-  if (command.startsWith('ebay') || command.startsWith('e') || command.startsWith('price')) {
+  // ebay
+  if (command.startsWith('ebay') || command.startsWith('price')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use eBay like this -> @ebay <item>")
@@ -259,20 +263,19 @@ client.on('message', async message => {
         return client.sendMessage(message.from, "Use ebay like this -> @ebay <item>") 
       }
 
-      client.sendMessage(message.from, `*eBay(.${res_ebay_data.tld})* result *'${res_ebay_data.item}'*` 
+      client.sendMessage(message.from, `*eBay(.${res_ebay_data.tld})* sold result *'${res_ebay_data.item}'*` 
       + `\nAverage: *${res_ebay_data.avg_price}${res_ebay_data.currency}*`
+      + `\nAverage (filtered): *${res_ebay_data.avg_price_filtered}${res_ebay_data.currency}*`
       + `\nLowest: ${res_ebay_data.min_price}${res_ebay_data.currency}`
-      + `\nHighest: ${res_ebay_data.max_price}${res_ebay_data.currency}`        
-      + `\nSold: ${res_ebay_data.sold_avg_price}${res_ebay_data.currency}`        
-      + `\n${res_ebay_data.url}`
-      + `\nSold: ${res_ebay_data.sold_url}`)
+      + `\nHighest: ${res_ebay_data.max_price}${res_ebay_data.currency}`  
+      + `\n${res_ebay_data.url}`)
     } catch(err){
       console.log("[@ebay] try catch ERR..." + err)
       return client.sendMessage(message.from, `err getting eBay for '${arg}'`)
     }
   }
 
-  //urban
+  // urban
   if (command.startsWith('urban') || command.startsWith('u') || command.startsWith('define') || command.startsWith('definition')) {
 
     if(arg <= 1) {
@@ -297,7 +300,7 @@ client.on('message', async message => {
     }
   }
 
-  //crypto
+  // crypto
   if (command.startsWith('crypto') || command.match('cc')) {
 
     try {  
@@ -314,7 +317,7 @@ client.on('message', async message => {
     }
   }
 
-  //weather (API only works for german cities)
+  // weather (germany)
   if (command.startsWith('wetter')) {
     const zahl = /^[0-9]./
     const buchstabe = /^[a-zA-Z]./
@@ -345,13 +348,13 @@ client.on('message', async message => {
     }
   }
 
-  //translate
+  // translate
   if (command.startsWith('tr')) {
       if(hasQuotedMsg) {
         quoted_message = message['_data']['quotedMsg']['body']
         message.body = `${message.body} ${quoted_message}`
       }
-      let translate_msg_arr = message.body.split(" ").toLowerCase()
+      let translate_msg_arr = message.body.toLowerCase().split(" ")
       if(translate_msg_arr.length <= 1) {
         return client.sendMessage(message.from, "Use translate like this -> @tr <from-language> <to-language> <text>")          
       } else if(translate_msg_arr.length > 1 && translate_msg_arr.length <= 2) {
@@ -453,7 +456,9 @@ client.on('message', async message => {
       }
   }
 
-  if(quiz_active) {
+
+  // quiz
+  if(active_quiz) {
     try {
       let new_answer = {}
       new_answer['answer'] = body 
@@ -462,33 +467,31 @@ client.on('message', async message => {
       new_answer['author'] = author
       new_answer['correct'] = false
       new_answer['subcorrect'] = false
-      if(!quiz_answers.some(item => item['author'] == new_answer['author'])) {
-        if(body == quiz_solution || body.toLowerCase() == quiz_solution.toLowerCase()) {
+      if(!active_quiz_answers.some(item => item['author'] == new_answer['author'])) {
+        if(body == active_quiz_solution || body.toLowerCase() == active_quiz_solution.toLowerCase()) {
           new_answer['correct'] = true
         }
-        if(!new_answer['correct'] && quiz_solution_arr.includes(body.toLowerCase()) && body.toLowerCase() !== '') {
+        if(!new_answer['correct'] && active_quiz_solution_arr.includes(body.toLowerCase()) && body.toLowerCase() !== '') {
           new_answer['subcorrect'] = true
         }
-        quiz_answers.push(new_answer)
+        active_quiz_answers.push(new_answer)
       }
     } catch(err) {
       console.log(`[@quiz] Couldn't add quiz answer ${body}`)
       console.log(err)
     }
   }
-
-  //quiz
   if (command.startsWith('quiz') || command.startsWith('q')) {
     var data = await quiz.quiz()
-    quiz_solution = data.antwort
-    quiz_solution_arr = data.antwort.toLowerCase().split(" ")
+    active_quiz_solution = data.antwort
+    active_quiz_solution_arr = data.antwort.toLowerCase().split(" ")
     client.sendMessage(message.from, `*Quiz*\n${data.frage}`)  
-    quiz_active = true
+    active_quiz = true
     await new Promise(resolve => setTimeout(resolve, 30000))
     client.sendMessage(message.from, `*Quiz solution*\n${data.antwort}`)
     if (config_data.api_mongodb) {
-      for (let qi = 0; qi < quiz_answers.length; qi++) {
-        if (quiz_answers[qi]['correct']) {
+      for (let qi = 0; qi < active_quiz_answers.length; qi++) {
+        if (active_quiz_answers[qi]['correct']) {
           points = 20;
           mgdb_m.mgdb(author, points)
             .then(id_obj => {
@@ -499,7 +502,7 @@ client.on('message', async message => {
               console.log("[@quiz] err(1):" + err)
             })
         }
-        if (quiz_answers[qi]['subcorrect']) {
+        if (active_quiz_answers[qi]['subcorrect']) {
           points = 5
           mgdb_m.mgdb(author, points)
             .then(id_obj => {
@@ -512,22 +515,63 @@ client.on('message', async message => {
         }
       }
     } else {
-      for (let qi = 0; qi < quiz_answers.length; qi++) {
-        if (quiz_answers[qi]['correct']) {
+      for (let qi = 0; qi < active_quiz_answers.length; qi++) {
+        if (active_quiz_answers[qi]['correct']) {
           points = 20
           client.sendMessage(message.from, `${notifyName} is correct +${points} points!`);
         }
-        if (quiz_answers[qi]['subcorrect']) {
+        if (active_quiz_answers[qi]['subcorrect']) {
           points = 5
           client.sendMessage(message.from, `${notifyName} is partly correct +${points} points!`)
         }
       }
     }
-    quiz_active = false 
-    quiz_answers = []
+    active_quiz = false 
+    active_quiz_answers = []
   }
 
-  //casino
+  // typeracer
+  if(active_typeracer) {
+    try {
+      let new_racer = {}
+      new_racer['answer'] = body 
+      new_racer['from'] = from
+      new_racer['notifyName'] = notifyName
+      new_racer['author'] = author
+      new_racer['correct'] = false
+      new_racer['timestamp'] = `${timestamp}`
+      new_racer['time'] = 0
+      if(!active_typeracer_racers.some(item => item['author'] == new_racer['author'])) {
+        if(body == typeracer_words) {
+          new_racer['correct'] = true
+          new_racer['time'] = timestamp - active_typeracer_timestamp
+        }
+        active_typeracer_racers.push(new_racer)
+      }
+    } catch(err) {
+      console.log(`[@typeracer] Couldn't add ${body}`)
+      console.log(err)
+    }
+  }
+  if (command.startsWith('typeracer') || command.startsWith('race')) {
+    typeracer_words = await wiki.rnwiki()
+    client.sendMessage(message.from, `Race starts in 5 seconds... \n\nType the text below:`)
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    client.sendMessage(message.from, `*${typeracer_words}*`)  
+    active_typeracer = true
+    active_typeracer_timestamp = timestamp
+    await new Promise(resolve => setTimeout(resolve, 30000))
+    client.sendMessage(message.from, `*Typeracer Results:*\n${
+      active_typeracer_racers.map(racer => `${racer.notifyName}: ${racer.time}s`).join('\n')
+    }`);
+
+
+    active_typeracer = false 
+    active_typeracer_timestamp = 0
+    active_typeracer_racers = []
+  }
+
+  // casino
   if (command.startsWith('casino') || command.startsWith('gamble')) {    
     let fruitArr = ['🍉','🍇','🍒','🍊','🍋','🥥','🌶']
     let winArr = []
@@ -565,91 +609,44 @@ client.on('message', async message => {
     }
 
   }
-  //wiki
+
+  // wiki
   if (command.startsWith('wiki')) {
     let wiki_result = await wiki.wiki(arg)
-    var umla = { 'ä' : '%C3%A4',
-          'Ä' : '%C3%84',
-          'ö' : '%C3%B6',
-          'Ö' : '%C3%96',
-          'ü' : '%C3%BC',
-          'Ü' : '%C3%9C',
-          'ß' : '%C3%9F'}
-    let linkarg = arg.replace(/[äÄöÖüÜß]/g, u => umla[u])
+    let linkarg = arg.replace(/[äÄöÖüÜß]/g, u => char_maps["utf8"][u])
     linkarg = linkarg.replace(' ','%20')
     client.sendMessage(message.from, `*Wikipedia* result *'${arg}'*` 
                                     + '\n' + wiki_result + '...'
                                     + `\nhttps://${config_data.lang}.wikipedia.org/wiki/${linkarg}`)
   }
 
-  //enwiki
+  // enwiki
   if (command.startsWith('enwiki')) {
     let wiki_result = await wiki.enwiki(arg)
-    var umla = { 'ä' : '%C3%A4',
-          'Ä' : '%C3%84', 
-          'ö' : '%C3%B6',
-          'Ö' : '%C3%96',
-          'ü' : '%C3%BC',
-          'Ü' : '%C3%9C',
-          'ß' : '%C3%9F'}
-    let linkarg = arg.replace(/[äÄöÖüÜß]/g, u => umla[u])
+    let linkarg = arg.replace(/[äÄöÖüÜß]/g, u => char_maps["utf8"][u])
     linkarg = linkarg.replace(' ','%20')
     client.sendMessage(message.from, `*Wikipedia* result *'${arg}'*` 
                                     + '\n' + wiki_result + '...'
                                     + `\nhttps://en.wikipedia.org/wiki/${linkarg}`)
   }
 
+  // rnwiki
+  if (command.startsWith('rnwiki')) {
+    let wiki_result = await wiki.rnwiki()
+
+    client.sendMessage(message.from, `*Wikipedia* result random` 
+                                    + '\n' + wiki_result + '...'
+                                    + `\n`)
+  }
 
 
 
-  if(config_data.autodetect_youtube && !message.body.includes('@')) {
-    if (message.body.includes('youtu.be/') || message.body.includes('youtube.com/watch?v=')) {
-        try {
-            let msg_req_link = `${message.body}`
-            let req_format= `mp4_worst`
-            let req_type = `start`
-            fn_download(msg_req_link, req_format, req_type)
-              .then(async (response) => {
-                  console.log(`response.downloadUrl: ${response.downloadUrl}`)
-                  console.log(`response.filename   : ${response.filename}`)
-                  console.log(`response.size       : ${response.size}`)
-                  let res_size_mb = (parseInt(`${response.size}`) / 1048576).toFixed(2)
-                  console.log(`res_size_mb         : ${res_size_mb}`)
-
-                  // to fix
-                  // https://github.com/pedroslopez/whatsapp-web.js/issues/3657
-
-                  try {
-                      const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
-                      await client.sendMessage(message.from, media, { 
-                        sendMediaAsDocument: true
-                      })
-                      console.log("Video sent successfully")
-                  } catch (err) {
-                      console.log(`autodetect err 1: ${err}`)
-                      client.sendMessage(message.from, `autodetect err 1 ${err}`)
-                  }
-              })
-              .catch(err => {
-                console.log(`autodetect err 2: ${err}`)
-                client.sendMessage(message.from, `autodetect err 2 ${err}`)
-              })
-
-        } catch (err) {
-            console.log(`autodetect err 3: ${err}`)
-            client.sendMessage(message.from, `autodetect err 3 ${err}`)
-        }
-    } 
-  } 
-
-
-  //ytmp3
+  // ytmp3
   if(command.startsWith('ytmp3') || command.startsWith('mp3') ) {
         try {
             let msg_req_link = `${arg}`
             let req_format= `mp3`
-            let req_type = `start`
-            fn_download(msg_req_link, req_format, req_type)
+            fn_download(msg_req_link, req_format)
               .then(async (response) => {
                   console.log(`response.downloadUrl: ${response.downloadUrl}`)
                   console.log(`response.filename   : ${response.filename}`)
@@ -679,13 +676,12 @@ client.on('message', async message => {
         }
   }
 
-  //ytmp4
+  // ytmp4
   if (command.startsWith('ytmp4') || command.startsWith('mp4')) {    
         try {
             let msg_req_link = `${arg}`
-            let req_format= `mp4_best`
-            let req_type = `start`
-            fn_download(msg_req_link, req_format, req_type)
+            let req_format= `mp4`
+            fn_download(msg_req_link, req_format)
               .then(async (response) => {
                   console.log(`response.downloadUrl: ${response.downloadUrl}`)
                   console.log(`response.filename   : ${response.filename}`)
@@ -695,9 +691,7 @@ client.on('message', async message => {
 
                   try {
                       const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
-                      await client.sendMessage(message.from, media, { 
-                        sendMediaAsDocument: true
-                      })
+                      await client.sendMessage(message.from, media)
                       console.log("Video sent successfully")
                   } catch (err) {
                       console.log(`ytmp4 err 1: ${err}`)
@@ -715,5 +709,3 @@ client.on('message', async message => {
         }
   }
 })
-
-console.log(`client inited!`)

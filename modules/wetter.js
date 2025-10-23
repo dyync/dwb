@@ -1,6 +1,6 @@
-const axios = require('axios');
-const config_data = require('../config.js');
-
+const axios = require('axios')
+const config_data = require('../config.js')
+const char_maps = require('../utils.js')
 
 async function plzWetter(plz) {
 
@@ -32,15 +32,7 @@ async function plzWetter(plz) {
 
 async function stadtWetter(stadt) {
 
-    var umla = { 'ä' : '%C3%A4',
-                 'Ä' : '%C3%84',
-                 'ö' : '%C3%B6',
-                 'Ö' : '%C3%96',
-                 'ü' : '%C3%BC',
-                 'Ü' : '%C3%9C',
-                 'ß' : '%C3%9F'}
-
-    stadt = stadt.replace(/[äÄöÖüÜß]/g, u => umla[u])
+    stadt = stadt.replace(/[äÄöÖüÜß]/g, u => char_maps["utf8"][u])
     stadt = stadt.replace(" ","%20")
 
     var getPLZ = {

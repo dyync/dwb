@@ -1,5 +1,6 @@
 const axios = require('axios')
 const he = require('he')
+const char_maps = require('../utils.js')
 
 async function quiz() {
     let mainconfig = {
@@ -16,6 +17,7 @@ async function quiz() {
             let antwort = data.results[0].correct_answer
             //accents
             antwort = antwort.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            antwort = antwort.replace(/&[a-zA-Z]+;/g, u => char_maps["entities"][u] || u);
             return { "frage" : frage, "antwort" : antwort }
         })
         .catch(function(error) {

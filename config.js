@@ -10,7 +10,5 @@ module.exports = {
     zipcode: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
     api_mongodb: false,
     api_openai: false,
-    api_openweather: false,
-    autodetect_youtube: true,
-    run_server: true
+    api_openweather: false
 };
