@@ -94,8 +94,8 @@ client.on('message', async message => {
     return;
   }
   var command = ''
-  if(body.startsWith('@')) {
-    command = body.trim().replace('@', '').split(/\s/).shift().toLowerCase()
+  if(body.startsWith('.')) {
+    command = body.trim().replace('.', '').split(/\s/).shift().toLowerCase()
   }  
   var arg
   if (hasQuotedMsg) {
@@ -161,19 +161,22 @@ client.on('message', async message => {
   }  
 
   // cmds
-  if (command.startsWith('cmd') || command.startsWith('info') || command.startsWith('?')) {
+  if (command.startsWith('cmd') || command.startsWith('info') || command.startsWith('help') || command.startsWith('?')) {
     client.sendMessage(message.from, `Commands` 
-    + `\n@translate`
-    + `\n@wiki`
-    + `\n@urban`
-    + `\n@imdb`
-    + `\n@ebay`
-    + `\n@crypto`
-    + `\n@wetter`
-    + `\n@quiz`
-    + `\n@casino`
-    + `\n@ytmp3`
-    + `\n@ytmp4`)
+    + `\n.ai _<text> ai question_`
+    + `\n.img _<text> create image_`
+    + `\n.tr _<text> translate_`
+    + `\n.ebay _<text> ebay_`
+    + `\n.imdb _<text> IMDb_`
+    + `\n.wiki _<text> wikipedia_`
+    + `\n.ub _<text> urban dictionairy_`
+    + `\n.cc _<token> crypto prices_`
+    + `\n.wetter _<stadt> wetter_`
+    + `\n.q _quiz_`
+    + `\n.r _typeracer_`
+    + `\n.casino _casino_`
+    + `\n.mp3 _<link> yt -> .mp3_`
+    + `\n.mp4 _<link> yt -> .mp4_`)
   }
 
   // ai
@@ -199,7 +202,7 @@ client.on('message', async message => {
   }
 
   // image
-  if (command.startsWith('image') || command.startsWith('picture')) {
+  if (command.startsWith('image') || command.startsWith('img') || command.startsWith('picture')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use chatgpt like this -> @gpt <question>")        
@@ -248,7 +251,7 @@ client.on('message', async message => {
   }
 
   // ebay
-  if (command.startsWith('ebay') || command.startsWith('price')) {
+  if (command.startsWith('ebay') || command.startsWith('price') || command.startsWith('eb')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use eBay like this -> @ebay <item>")
@@ -264,10 +267,10 @@ client.on('message', async message => {
       }
 
       client.sendMessage(message.from, `*eBay(.${res_ebay_data.tld})* sold result *'${res_ebay_data.item}'*` 
-      + `\nAverage: *${res_ebay_data.avg_price}${res_ebay_data.currency}*`
-      + `\nAverage (filtered): *${res_ebay_data.avg_price_filtered}${res_ebay_data.currency}*`
-      + `\nLowest: ${res_ebay_data.min_price}${res_ebay_data.currency}`
-      + `\nHighest: ${res_ebay_data.max_price}${res_ebay_data.currency}`  
+      + `\nAverage : *${res_ebay_data.avg_price}${res_ebay_data.currency}*`
+      + `\nFiltered: *${res_ebay_data.avg_price_filtered}${res_ebay_data.currency}*`
+      + `\nLowest  : ${res_ebay_data.min_price}${res_ebay_data.currency}`
+      + `\nHighest : ${res_ebay_data.max_price}${res_ebay_data.currency}`  
       + `\n${res_ebay_data.url}`)
     } catch(err){
       console.log("[@ebay] try catch ERR..." + err)
@@ -276,7 +279,7 @@ client.on('message', async message => {
   }
 
   // urban
-  if (command.startsWith('urban') || command.startsWith('u') || command.startsWith('define') || command.startsWith('definition')) {
+  if (command.startsWith('ud') || command.startsWith('urban') || command.startsWith('urbandictionary')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use urban dictionary definition like this -> @urban <term>")        

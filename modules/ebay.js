@@ -142,51 +142,48 @@ async function ebay_first_page(item) {
 }
 
 async function ebay(item) {
-    let ebay_currency = config_data["currency_symbol"] || "$";
-    let item_no_space = item.replaceAll(" ","+");
-    
-    let res_obj = {};
+    const ebay_currency = config_data["currency_symbol"] || "$";
+    const item_no_space = item.replaceAll(" ","+");
+    const res_obj = {};
     let ebay_res_prices = await ebay_first_page(item);
-    
-    // Filter valid prices
     ebay_res_prices = ebay_res_prices.filter(value => 
         !isNaN(value) && value > 0 && typeof value === 'number'
-    );
+    )
 
-    // Remove duplicates and sort
     ebay_res_prices = [...new Set(ebay_res_prices)].sort((a, b) => a - b);
 
-    console.log(`Filtered prices:`, ebay_res_prices);
+    console.log(`Filtered prices:`, ebay_res_prices)
 
     if(ebay_res_prices.length < 1) {
-        res_obj['status'] = 404;
-        res_obj['item'] = item;
-        res_obj['error'] = 'No prices found - may need to update selectors';
-        return res_obj;
+        res_obj['status'] = 404
+        res_obj['item'] = item
+        res_obj['error'] = 'No prices found - may need to update selectors'
+        return res_obj
     }
     
-    const ebay_res_prices_average = ebay_res_prices.reduce((a, b) => a + b, 0) / ebay_res_prices.length;
-    const ebay_res_prices_average_filtered = (ebay_res_prices) => {
-        const s = [...ebay_res_prices].sort((a, b) => a - b);
-        const q1 = s[Math.floor(s.length * 0.25)];
-        const q3 = s[Math.floor(s.length * 0.75)];
-        const iqr = q3 - q1;
-        const f = ebay_res_prices.filter(n => n >= q1 - 1.5 * iqr && n <= q3 + 1.5 * iqr);
-        return f.reduce((a, b) => a + b, 0) / f.length;
-    };
-    res_obj['status'] = 200;
-    res_obj['item'] = item;
-    res_obj['min_price'] = Math.min(...ebay_res_prices).toFixed(2);
-    res_obj['max_price'] = Math.max(...ebay_res_prices).toFixed(2);
-    res_obj['avg_price'] = ebay_res_prices_average.toFixed(2);
-    res_obj['avg_price_filtered'] = ebay_res_prices_average_filtered(ebay_res_prices).toFixed(2);
-    res_obj['tld'] = config_data["tld"];
-    res_obj['currency'] = ebay_currency;
-    res_obj['url'] = `https://www.ebay.${config_data["tld"]}/sch/i.html?_nkw=${item_no_space}&_sacat=0&LH_Complete=1&LH_Sold=1`;
-    res_obj['prices_found'] = ebay_res_prices.length;
-    res_obj['all_prices'] = ebay_res_prices;
+    const ebay_res_prices_average = ebay_res_prices.reduce((a, b) => a + b, 0) / ebay_res_prices.length
+    const ebay_res_prices_average_fixed = ebay_res_prices_average.toFixed(2)
+    const ebay_res_prices_asc = [...ebay_res_prices].sort((a, b) => a - b)
+    const ebay_res_prices_q1 = ebay_res_prices_asc[Math.floor(ebay_res_prices_asc.length * 0.25)]
+    const ebay_res_prices_q3 = ebay_res_prices_asc[Math.floor(ebay_res_prices_asc.length * 0.75)]
+    const ebay_res_prices_q_interval = ebay_res_prices_q3 - ebay_res_prices_q1
+    const ebay_res_prices_filtered_arr = ebay_res_prices.filter(n => n >= ebay_res_prices_q1 - 1.5 * ebay_res_prices_q_interval && n <= ebay_res_prices_q3 + 1.5 * ebay_res_prices_q_interval)
+    const ebay_res_prices_filtered_avg = ebay_res_prices_filtered_arr.reduce((a, b) => a + b, 0) / ebay_res_prices_filtered_arr.length
+    const ebay_res_prices_filtered_avg_fixed = ebay_res_prices_filtered_avg.toFixed(2);
 
-    return res_obj;
+    res_obj['status'] = 200
+    res_obj['item'] = item
+    res_obj['min_price'] = Math.min(...ebay_res_prices).toFixed(2)
+    res_obj['max_price'] = Math.max(...ebay_res_prices).toFixed(2)
+    res_obj['avg_price'] = ebay_res_prices_average_fixed
+    res_obj['avg_price_filtered'] = ebay_res_prices_filtered_avg_fixed
+    res_obj['tld'] = config_data["tld"]
+    res_obj['currency'] = ebay_currency
+    res_obj['url'] = `https://www.ebay.${config_data["tld"]}/sch/i.html?_nkw=${item_no_space}&_sacat=0&LH_Complete=1&LH_Sold=1`
+    res_obj['prices_found'] = ebay_res_prices.length
+    res_obj['all_prices'] = ebay_res_prices
+
+    return res_obj
 }
 
 module.exports = {

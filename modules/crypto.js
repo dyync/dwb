@@ -8,8 +8,8 @@ possible_tokens = ["00", "1INCH", "AAVE", "ABT", "ACH", "ACS", "ADA", "AERGO", "
 
 async function getCrypto(token,cur) {
     cur = cur.toUpperCase()
-    let random_user_agent = randomUseragent.getRandom();
-    var mainconfig = {
+    const random_user_agent = randomUseragent.getRandom();
+    const mainconfig = {
         timeout: 5000,
         headers: {
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -49,8 +49,8 @@ async function getCrypto(token,cur) {
         })
 }
 async function getAllCrypto(args) {
-    total_res_obj = {}
-    let anti_spam_to = 5000    
+    const total_res_obj = {}
+    const anti_spam_to = 5000    
     crypto_args = args.replaceAll(', ',',')
     crypto_args_arr = crypto_args.split(' ')
     toquery_tokens = default_tokens
@@ -76,9 +76,9 @@ async function getAllCrypto(args) {
     }
 
     for(token_index in toquery_tokens) {
-        var token_price = await getCrypto(toquery_tokens[token_index].toUpperCase(),toquery_currency)
-        var retry_attempts = 1
-        var token_price_found = false
+        const token_price = await getCrypto(toquery_tokens[token_index].toUpperCase(),toquery_currency)
+        const retry_attempts = 1
+        const token_price_found = false
 
         if(token_price.status == 200) {   
             total_res_obj[toquery_tokens[token_index].toUpperCase()] = token_price['token_price'] + " " + token_price['token_currency']

@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 async function vllm(req_prompt) {
-    var mainconfig = {
+    const mainconfig = {
         method: 'post',
         url: 'https://nai9.com/api',
         data: {
@@ -29,7 +29,7 @@ async function vllm(req_prompt) {
 }
 
 async function image(req_prompt) {
-    var mainconfig = {
+    const mainconfig = {
         method: 'post',
         url: 'https://nai9.com/api',
         data: {

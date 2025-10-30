@@ -40,22 +40,33 @@ pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 
 Current cmds:
 ```shell
-    @translate <text>[ <from> <to>]
-    @wiki <text>
-    @urban <text>
-    @imdb <text>
-    @ebay <text>
-    @crypto <token> | 3rd party API
-    @wetter <text>  | 3rd party API
-    @quiz           | mongodb
-    @casino         | mongodb
-    @mp3 <yt-link>  | cookies.txt
-    @mp4 <yt-link>  | cookies.txt
+    .ai <text>
+    .img <text>
+    .tr <text> [<from> [<to>]]
+    .ebay <text>
+    .imdb <text>
+    .wiki <text>
+    .ub <text>
+    .imdb <text>
+    .ebay <text>
+    .cc [<token>]
+    .wetter <city/PLZ>
+    .q
+    .r
+    .casino
+    .mp3 <link>
+    .mp4 <link>
 ```
 
+
+    + `\n.q _Quiz_`
+    + `\n.r _Typeracer_`
+    + `\n.casino`
+    + `\n.mp3 <link> _YouTube -> .mp3_`
+    + `\n.mp4 <link> _YouTube -> .mp4_`)
 ## Optional
 
-To use @mp3 and @mp4 additional steps are required:
+To use .mp3 and .mp4 additional steps are required:
 
 ```shell
     sudo apt update && sudo apt install yt-dlp ffmpeg -y
