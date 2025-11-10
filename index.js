@@ -556,7 +556,7 @@ client.on('message', async message => {
       console.log(err)
     }
   }
-  if (command.startsWith('typeracer') || command.startsWith('race')) {
+  if (command.startsWith('r') || command.startsWith('race') || command.startsWith('race')) {
     typeracer_words = await wiki.rnwiki()
     client.sendMessage(message.from, `Race starts in 5 seconds... \n\nType the text below:`)
     await new Promise(resolve => setTimeout(resolve, 5000))

@@ -130,7 +130,7 @@ app.post('/download', async (req, res) => {
 
 
 
-
+        const useCookies = fs.existsSync(COOKIES_PATH)
 
         const { link, format } = req.body
         
@@ -146,7 +146,10 @@ app.post('/download', async (req, res) => {
         const req_yt_id = extractYouTubeId(link_clean)
         console.log(`*req_yt_id: ${req_yt_id}`)
         const req_url = `https://www.youtube.com/watch?v=${req_yt_id}`;
-        const command = `yt-dlp --list-formats ${req_url}`;
+        let command = `yt-dlp --list-formats ${req_url}`;
+        if (useCookies) {
+            command += ` --cookies "${COOKIES_PATH}"`
+        }
         console.log(`Executing info command: ${command}`);
         const executeCommand = () => {
             return new Promise((resolve, reject) => {
@@ -198,7 +201,7 @@ app.post('/download', async (req, res) => {
 
 
         
-        const useCookies = fs.existsSync(COOKIES_PATH)
+
         const timestamp = Date.now()
 
         console.log(`*format    : ${format}`)
