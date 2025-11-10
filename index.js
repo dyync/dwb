@@ -14,7 +14,6 @@ const quiz = require('./modules/quiz')
 const imdb = require('./modules/imdb')
 const ebay = require('./modules/ebay')
 const ai = require('./modules/ai')
-const openai = require('./modules/openai')
 const crypto = require('./modules/crypto')
 const urban = require('./modules/urban')
 const config_data = require('./config.js')
@@ -32,9 +31,7 @@ console.log(`************************`)
 console.log(`Language          : ${config_data.lang}`)
 console.log(`Currency          : ${config_data.currency}`)
 console.log(`api_mongodb       : ${config_data.api_mongodb}`)
-console.log(`api_openai        : ${config_data.api_openai}`)
 console.log(`api_openweather   : ${config_data.api_openweather}`)
-console.log(`autodetect_youtube: ${config_data.autodetect_youtube}`)
 console.log(`host_address      : ${host_address}`)
 console.log(`server_address    : ${server_address}`)
 console.log(`************************`)
@@ -66,23 +63,23 @@ const client = new Client({
   }
 })
 
-client.initialize();  
+client.initialize()
 
 client.on('qr', (qr) => {
-  console.log('QR RECEIVED', qr);
-  qrcode.generate(qr, {small: true});
+  console.log('QR RECEIVED', qr)
+  qrcode.generate(qr, {small: true})
 })
 
 client.on('authenticated', () => {
-  console.log('AUTHENTICATED');
+  console.log('AUTHENTICATED')
 })
 
 client.on('auth_failure', message => {
-  console.log('AUTHENTICATION FAILURE', message);
+  console.log('AUTHENTICATION FAILURE', message)
 })
 
 client.on('ready', () => {
-  console.log('DYNCOO BOT ONLINE!');
+  console.log('DYNCOO WHATSAPP BOT ONLINE!')
 })
 
 
@@ -163,18 +160,18 @@ client.on('message', async message => {
   // cmds
   if (command.startsWith('cmd') || command.startsWith('info') || command.startsWith('help') || command.startsWith('?')) {
     client.sendMessage(message.from, `Commands` 
-    + `\n.ai _<text> ai question_`
-    + `\n.img _<text> create image_`
-    + `\n.tr _<text> translate_`
-    + `\n.ebay _<text> ebay_`
-    + `\n.imdb _<text> IMDb_`
     + `\n.wiki _<text> wikipedia_`
-    + `\n.ub _<text> urban dictionairy_`
-    + `\n.cc _<token> crypto prices_`
+    + `\n.translate _<text> translate_`
+    + `\n.urban _<text> urban dictionairy_`
+    + `\n.imdb _<text> IMDb_`
+    + `\n.crypto _<token> crypto prices_`
     + `\n.wetter _<stadt> wetter_`
     + `\n.q _quiz_`
     + `\n.r _typeracer_`
     + `\n.casino _casino_`
+    + `\n.ebay _<text> ebay_`
+    + `\n.ai _<text> ai question_`
+    + `\n.img _<text> create image_`
     + `\n.mp3 _<link> yt -> .mp3_`
     + `\n.mp4 _<link> yt -> .mp4_`)
   }
@@ -279,7 +276,7 @@ client.on('message', async message => {
   }
 
   // urban
-  if (command.startsWith('ud') || command.startsWith('urban') || command.startsWith('urbandictionary')) {
+  if (command.startsWith('urban') || command.startsWith('urban') || command.startsWith('urbandictionary')) {
 
     if(arg <= 1) {
       return client.sendMessage(message.from, "Use urban dictionary definition like this -> @urban <term>")        
@@ -340,7 +337,7 @@ client.on('message', async message => {
         }).catch(err => {
             client.sendMessage(message.from, `wetter translate err ${err}`)
             console.log("@wetter translate err: " + err)
-        });
+        })
         client.sendMessage(message.from, `*Wetter für ${data.place}*\n` 
                                     + "\n*Temp:* "+ data.current_temp + " °C"  
                                     + "\n*Bedingungen:* "+ bedingungen
@@ -352,7 +349,7 @@ client.on('message', async message => {
   }
 
   // translate
-  if (command.startsWith('tr')) {
+  if (command.startsWith('translate') || command.startsWith('tr')) {
       if(hasQuotedMsg) {
         quoted_message = message['_data']['quotedMsg']['body']
         message.body = `${message.body} ${quoted_message}`
@@ -651,18 +648,11 @@ client.on('message', async message => {
             let req_format= `mp3`
             fn_download(msg_req_link, req_format)
               .then(async (response) => {
-                  console.log(`response.downloadUrl: ${response.downloadUrl}`)
-                  console.log(`response.filename   : ${response.filename}`)
-                  console.log(`response.size       : ${response.size}`)
-                  let res_size_mb = (parseInt(`${response.size}`) / 1048576).toFixed(2)
-                  console.log(`res_size_mb         : ${res_size_mb}`)
-
                   try {
                       const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
                       await client.sendMessage(message.from, media, { 
                         sendMediaAsDocument: true
                       })
-                      console.log("Video sent successfully")
                   } catch (err) {
                       console.log(`ytmp3 err 1: ${err}`)
                       client.sendMessage(message.from, `ytmp3 err 1 ${err}`)
@@ -672,7 +662,6 @@ client.on('message', async message => {
                 console.log(`ytmp3 err 2: ${err}`)
                 client.sendMessage(message.from, `ytmp3 err 2 ${err}`)
               })
-
         } catch (err) {
             console.log(`ytmp3 err 3: ${err}`)
             client.sendMessage(message.from, `ytmp3 err 3 ${err}`)
@@ -686,16 +675,9 @@ client.on('message', async message => {
             let req_format= `mp4`
             fn_download(msg_req_link, req_format)
               .then(async (response) => {
-                  console.log(`response.downloadUrl: ${response.downloadUrl}`)
-                  console.log(`response.filename   : ${response.filename}`)
-                  console.log(`response.size       : ${response.size}`)
-                  let res_size_mb = (parseInt(`${response.size}`) / 1048576).toFixed(2)
-                  console.log(`res_size_mb         : ${res_size_mb}`)
-
                   try {
                       const media = MessageMedia.fromFilePath(`./downloads/${response.filename}`)
                       await client.sendMessage(message.from, media)
-                      console.log("Video sent successfully")
                   } catch (err) {
                       console.log(`ytmp4 err 1: ${err}`)
                       client.sendMessage(message.from, `ytmp4 err 1 ${err}`)
@@ -705,7 +687,6 @@ client.on('message', async message => {
                 console.log(`ytmp4 err 2: ${err}`)
                 client.sendMessage(message.from, `ytmp4 err 2 ${err}`)
               })
-
         } catch (err) {
             console.log(`ytmp4 err 3: ${err}`)
             client.sendMessage(message.from, `ytmp4 err 3 ${err}`)

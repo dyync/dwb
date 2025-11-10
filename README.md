@@ -40,36 +40,30 @@ pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 
 Current cmds:
 ```shell
-    .ai <text>
-    .img <text>
-    .tr <text> [<from> [<to>]]
-    .ebay <text>
-    .imdb <text>
-    .wiki <text>
-    .ub <text>
-    .imdb <text>
-    .ebay <text>
-    .cc [<token>]
+    .wiki <text/quote>
+    .translate <text/quote> [<from> [<to>]]
+    .urban <text/quote>
+    .imdb <text/quote>
+    .crypto [<token>]
     .wetter <city/PLZ>
-    .q
-    .r
+    .quiz
+    .race
     .casino
+    .ebay <text/quote>
+    .ai <text/quote>
+    .image <text/quote>
     .mp3 <link>
     .mp4 <link>
 ```
 
-
-    + `\n.q _Quiz_`
-    + `\n.r _Typeracer_`
-    + `\n.casino`
-    + `\n.mp3 <link> _YouTube -> .mp3_`
-    + `\n.mp4 <link> _YouTube -> .mp4_`)
 ## Optional
 
-To use .mp3 and .mp4 additional steps are required:
+To download youtube into .mp3 and .mp4 files get your own youtube cookies.txt (with any browser addon), install yt-dlp + ffmpeg and run the server.js
 
 ```shell
     sudo apt update && sudo apt install yt-dlp ffmpeg -y
 ```
 
-Update cookies.txt by visiting youtube and saving your site cookies with any browser add-on.
+```shell
+pm2 start server.js --name "dwb_server" --cron-restart="0 3 * * *"
+```
