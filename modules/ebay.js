@@ -67,9 +67,7 @@ async function ebay(item) {
             
             // Try multiple selectors
             const selectors = [
-                '.s-card__price',
-                '.s-item__price',
-                '[class*="price"]'
+                '.s-card__price'
             ];
 
             for (const selector of selectors) {

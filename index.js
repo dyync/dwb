@@ -263,7 +263,7 @@ client.on('message', async message => {
         return client.sendMessage(message.from, "Use ebay like this -> @ebay <item>") 
       }
 
-      client.sendMessage(message.from, `*eBay(.${res_ebay_data.tld})* sold result *'${res_ebay_data.item}'*` 
+      client.sendMessage(message.from, `*eBay(.${res_ebay_data.tld})* sold prices for *'${res_ebay_data.item}'*` 
       + `\nAverage : *${res_ebay_data.avg_price}${res_ebay_data.currency}*`
       + `\nFiltered: *${res_ebay_data.avg_price_filtered}${res_ebay_data.currency}*`
       + `\nLowest  : ${res_ebay_data.min_price}${res_ebay_data.currency}`
