@@ -102,4 +102,8 @@ async function imdb(moviename) {
 }
 
 
-module.exports = { imdb_find_titles, imdb_info, imdb };
+module.exports = { 
+  imdb_find_titles, 
+  imdb_info, 
+  imdb 
+};
