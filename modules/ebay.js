@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const config_data = require('../config.js');
 
 async function ebay_first_page(item) {
-  let found_prices = []
+  let found_prices = [];
   try {
     let item_no_space = item.replaceAll(" ","+");
     
@@ -26,65 +26,96 @@ async function ebay_first_page(item) {
         method: 'get',
         url: `https://www.ebay.${config_data["tld"]}/sch/i.html?_nkw=${item_no_space}&_sacat=0&LH_Complete=1&LH_Sold=1`,
         timeout: 10000
-    }
+    };  
+    
     return axios(imdb_config)
         .then(async function(response) {
+            // Check if we got a challenge page instead of actual results
             if (response.data.includes('Pardon Our Interruption') || 
                 response.data.includes('splashui/challenge') ||
                 response.data.includes('bot detection')) {
-                console.log('eBay challenge page detected - request blocked')
-                return found_prices
+                console.log('eBay challenge page detected - request blocked');
+                return found_prices;
             }
-            const $ = cheerio.load(response.data)
+            
+            console.log(`Successfully fetched eBay page`);
+            const $ = cheerio.load(response.data);
+            
+            // Debug: Save HTML to file for inspection
+            // const fs = require('fs');
+            // fs.writeFileSync('debug_ebay.html', response.data);
+            // console.log('HTML saved to debug_ebay.html for inspection');
+            
+            // Try multiple possible selectors for eBay price elements
             const priceSelectors = [
                 '.s-item__price',
                 '.srp-results .s-item__price',
                 '[class*="price"]',
                 '.s-item__details .s-item__price'
-            ]
+            ];
+            
+            console.log('Searching for prices with selectors...');
+            
             for (const selector of priceSelectors) {
-                const priceElements = $(selector)
+                const priceElements = $(selector);
+                console.log(`Selector "${selector}" found ${priceElements.length} elements`);
+                
                 priceElements.each(function (i, element) {
-                    let priceText = $(element).text().trim()
+                    let priceText = $(element).text().trim();
                     if (priceText && priceText !== '') {
-                        if (priceText.toLowerCase().includes(' to ')) {
-                            priceText = priceText.split(' to ')[0]
-                        }
-                        let cleanedPrice = priceText.replace(/[^\d.,]/g, '')
-                        cleanedPrice = cleanedPrice.replace(',', '.')
+                        console.log(`Found price text: "${priceText}"`);
                         
-                        const priceMatch = priceText.match(/(\d+[.,]\d+|\d+)/)
+                        // Extract the first price if there's a range (e.g., "$100.00 to $200.00")
+                        if (priceText.toLowerCase().includes(' to ')) {
+                            priceText = priceText.split(' to ')[0];
+                        }
+                        
+                        // Clean and convert price
+                        let cleanedPrice = priceText.replace(/[^\d.,]/g, '');
+                        cleanedPrice = cleanedPrice.replace(',', '.');
+                        
+                        // Handle currency symbols and format
+                        const priceMatch = priceText.match(/(\d+[.,]\d+|\d+)/);
                         if (priceMatch) {
-                            let priceValue = priceMatch[0].replace(',', '.')
-                            let formattedPrice = parseFloat(priceValue)
+                            let priceValue = priceMatch[0].replace(',', '.');
+                            let formattedPrice = parseFloat(priceValue);
                             
                             if (!isNaN(formattedPrice) && formattedPrice > 0) {
-
+                                // If price seems too low (likely in cents), convert to dollars
                                 if (formattedPrice < 10 && priceText.includes(config_data["currency_symbol"] || "$")) {
-                                    formattedPrice = formattedPrice * 100
+                                    formattedPrice = formattedPrice * 100;
                                 }
-                                found_prices.push(formattedPrice)
+                                
+                                found_prices.push(formattedPrice);
+                                console.log(`Added price: $${formattedPrice}`);
                             }
                         }
                     }
-                })
+                });
             }
+            
+            // Alternative approach: Look for li elements with specific classes
             const itemSelectors = [
                 'li.s-item',
                 '.srp-results li',
                 '[data-viewport*="item"]',
                 '.s-item__wrapper'
-            ]
+            ];
+            
             for (const selector of itemSelectors) {
                 $(selector).each(function (i, element) {
-                    const priceElement = $(element).find('.s-item__price')
+                    const priceElement = $(element).find('.s-item__price');
                     if (priceElement.length) {
-                        let priceText = priceElement.first().text().trim()
+                        let priceText = priceElement.first().text().trim();
                         if (priceText) {
-                            const priceMatch = priceText.match(/(\d+[.,]\d+|\d+)/)
+                            console.log(`Item price: "${priceText}"`);
+                            
+                            // Extract numeric price
+                            const priceMatch = priceText.match(/(\d+[.,]\d+|\d+)/);
                             if (priceMatch) {
-                                let priceValue = priceMatch[0].replace(',', '.')
-                                let formattedPrice = parseFloat(priceValue)
+                                let priceValue = priceMatch[0].replace(',', '.');
+                                let formattedPrice = parseFloat(priceValue);
+                                
                                 if (!isNaN(formattedPrice) && formattedPrice > 0) {
                                     if (formattedPrice < 10 && priceText.includes(config_data["currency_symbol"] || "$")) {
                                         formattedPrice = formattedPrice * 100;
@@ -94,29 +125,35 @@ async function ebay_first_page(item) {
                             }
                         }
                     }
-                })
+                });
             }
-            return found_prices
+            
+            console.log(`Total prices found: ${found_prices.length}`);
+            return found_prices;
         })
-        .catch(function(err) {
-            console.log(`[ebay] req err: ${err}`)
-            return found_prices
-        })
+        .catch(function(error) {
+            console.log('Axios request failed:', error.message);
+            return found_prices;
+        });
   } catch (err) {
-    console.log(`[ebay] fn err: ${err}`)
-    return found_prices
+    console.error('Error in ebay_first_page:', err);
+    return found_prices;
   } 
 }
 
 async function ebay(item) {
-    const ebay_currency = config_data["currency_symbol"] || "$"
-    const item_no_space = item.replaceAll(" ","+")
-    const res_obj = {}
-    let ebay_res_prices = await ebay_first_page(item)
+    const ebay_currency = config_data["currency_symbol"] || "$";
+    const item_no_space = item.replaceAll(" ","+");
+    const res_obj = {};
+    let ebay_res_prices = await ebay_first_page(item);
     ebay_res_prices = ebay_res_prices.filter(value => 
         !isNaN(value) && value > 0 && typeof value === 'number'
     )
-    ebay_res_prices = [...new Set(ebay_res_prices)].sort((a, b) => a - b)
+
+    ebay_res_prices = [...new Set(ebay_res_prices)].sort((a, b) => a - b);
+
+    console.log(`ebay_res_prices:`, ebay_res_prices)
+
     if(ebay_res_prices.length < 1) {
         res_obj['status'] = 404
         res_obj['item'] = item
@@ -126,14 +163,14 @@ async function ebay(item) {
     
     const ebay_res_prices_average = ebay_res_prices.reduce((a, b) => a + b, 0) / ebay_res_prices.length
     const ebay_res_prices_average_fixed = ebay_res_prices_average.toFixed(2)
-    const mean = ebay_res_prices.reduce((a, b) => a + b, 0) / ebay_res_prices.length
-    const stdDev = Math.sqrt(ebay_res_prices.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / ebay_res_prices.length)
-    const lowerBound = mean - 2 * stdDev
-    const upperBound = mean + 2 * stdDev
-    const ebay_res_prices_filtered_arr = ebay_res_prices.filter(n => n >= lowerBound && n <= upperBound)
+    const ebay_res_prices_asc = [...ebay_res_prices].sort((a, b) => a - b)
+    const ebay_res_prices_q1 = ebay_res_prices_asc[Math.floor(ebay_res_prices_asc.length * 0.25)]
+    const ebay_res_prices_q3 = ebay_res_prices_asc[Math.floor(ebay_res_prices_asc.length * 0.75)]
+    const ebay_res_prices_q_interval = ebay_res_prices_q3 - ebay_res_prices_q1
+    const ebay_res_prices_filtered_arr = ebay_res_prices.filter(n => n >= ebay_res_prices_q1 - 0.5 * ebay_res_prices_q_interval && n <= ebay_res_prices_q3 + 0.5 * ebay_res_prices_q_interval)
     const ebay_res_prices_filtered_avg = ebay_res_prices_filtered_arr.reduce((a, b) => a + b, 0) / ebay_res_prices_filtered_arr.length
     const ebay_res_prices_filtered_avg_fixed = ebay_res_prices_filtered_avg.toFixed(2);
-
+    console.log(`ebay_res_prices_filtered_arr:`, ebay_res_prices_filtered_arr)
     res_obj['status'] = 200
     res_obj['item'] = item
     res_obj['min_price'] = ebay_res_prices_filtered_arr[0].toFixed(2)

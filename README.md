@@ -58,7 +58,7 @@ Current cmds:
 
 ## Optional
 
-To download youtube into .mp3 and .mp4 files get your own youtube cookies.txt (with any browser addon), install yt-dlp + ffmpeg and run the server.js
+To download youtube into .mp3 and .mp4 files get cookies.txt (with any browser addon) from youtube, install yt-dlp, install ffmpeg and run the server.js
 
 ```shell
     sudo apt update && sudo apt install yt-dlp ffmpeg -y
