@@ -48,10 +48,7 @@ async function ebay_first_page(item) {
             
             // Try multiple possible selectors for eBay price elements
             const priceSelectors = [
-                '.s-item__price',
-                '.srp-results .s-item__price',
-                '[class*="price"]',
-                '.s-item__details .s-item__price'
+                '.s-card__price'
             ];
             
             console.log('Searching for prices with selectors...');
