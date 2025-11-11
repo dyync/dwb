@@ -37,8 +37,8 @@ async function ebay(item) {
             timeout: 30000 
         });
 
-        // Wait for content to load
-        await page.waitForTimeout(3000);
+        // Wait for content to load - FIXED: Use waitForTimeout replacement
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // Check if we got a challenge page
         const pageTitle = await page.title();
@@ -53,6 +53,13 @@ async function ebay(item) {
         const fs = require('fs');
         fs.writeFileSync('ebay-debug.html', html);
         console.log('HTML saved to ebay-debug.html');
+
+        // Wait for price elements to be visible - ADDED: Better waiting for dynamic content
+        try {
+            await page.waitForSelector('.s-item__price, .s-card__price', { timeout: 10000 });
+        } catch (e) {
+            console.log('Price selector not found within timeout, continuing anyway...');
+        }
 
         // Extract prices using the exact selector you found
         const prices = await page.evaluate(() => {
