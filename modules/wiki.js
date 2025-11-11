@@ -2,16 +2,32 @@ const axios = require('axios')
 const config_data = require('../config.js')
 const char_maps = require('../utils.js')
 
+ebay_headers = {
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'accept-language': 'en-US,en;q=0.5',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'accept-encoding': 'gzip, deflate, br',
+    'cache-control': 'no-cache',
+    'pragma': 'no-cache',
+    'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-site': 'none',
+    'upgrade-insecure-requests': '1'
+}
 async function wiki(word) {
 
     word = word.replace(/[äÄöÖüÜß]/g, u => char_maps["utf8"][u])
 
-    var mainconfig = {
+    var ebay_config = {
+        headers: ebay_headers,
         method: 'get',
         url: `https://${config_data.lang}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=${word}`
     }
 
-    return axios(mainconfig)
+    return axios(ebay_config)
         .then(async function(response) {
             let data = response.data
             dataNum = Object.keys(data.query.pages)[0]
@@ -27,12 +43,13 @@ async function enwiki(word) {
 
     word = word.replace(/[äÄöÖüÜß]/g, u => char_maps["utf8"][u])
 
-    var mainconfig = {
+    var ebay_config = {
+        headers: ebay_headers,
         method: 'get',
         url: `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=${word}`
     }
 
-    return axios(mainconfig)
+    return axios(ebay_config)
         .then(async function(response) {
             let data = response.data
             dataNum = Object.keys(data.query.pages)[0]
@@ -46,6 +63,7 @@ async function enwiki(word) {
 async function rnwiki(retries = 3) {
 
     var mainconfig = {
+        headers: ebay_headers,
         method: 'get',
         url: `https://${config_data.lang}.wikipedia.org/w/api.php?format=json&action=query&generator=random&grnnamespace=0&prop=extracts&exintro&explaintext&redirects=1`
     }
