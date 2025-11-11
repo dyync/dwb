@@ -40,28 +40,28 @@ pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 
 Current cmds:
 ```shell
-    .wiki <text/quote>
-    .translate <text/quote> [<from> [<to>]]
-    .urban <text/quote>
-    .imdb <text/quote>
-    .crypto [<token>]
-    .wetter <city/PLZ>
-    .quiz
-    .race
-    .casino
-    .ebay <text/quote>
-    .ai <text/quote>
-    .image <text/quote>
-    .mp3 <link>
-    .mp4 <link>
+.wiki <text/quote>
+.translate <text/quote> [<from> [<to>]]
+.urban <text/quote>
+.imdb <text/quote>
+.crypto [<token>]
+.wetter <city/PLZ>
+.quiz
+.race
+.casino
+.ebay <text/quote>
+.ai <text/quote>
+.image <text/quote>
+.mp3 <link>
+.mp4 <link>
 ```
 
 ## Optional
 
-To download youtube into .mp3 and .mp4 files get cookies.txt (with any browser addon) from youtube, install yt-dlp, install ffmpeg and run the server.js
+To download youtube into .mp3 and .mp4 files, get cookies.txt from youtube (with any browser addon), install yt-dlp, install ffmpeg and run the server.js
 
 ```shell
-    sudo apt update && sudo apt install yt-dlp ffmpeg -y
+sudo apt update && sudo apt install yt-dlp ffmpeg -y
 ```
 
 ```shell
