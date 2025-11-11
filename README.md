@@ -40,8 +40,10 @@ pm2 start index.js --name "dwb" --cron-restart="0 3 * * *"
 
 Current cmds:
 ```shell
-.wiki <text/quote>
+.ebay <text/quote>
 .translate <text/quote> [<from> [<to>]]
+.wiki <text/quote>
+.imdb <text/quote>
 .urban <text/quote>
 .imdb <text/quote>
 .crypto [<token>]
@@ -49,7 +51,6 @@ Current cmds:
 .quiz
 .race
 .casino
-.ebay <text/quote>
 .ai <text/quote>
 .image <text/quote>
 .mp3 <link>

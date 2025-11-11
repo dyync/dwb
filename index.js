@@ -160,8 +160,9 @@ client.on('message', async message => {
   // cmds
   if (command.startsWith('cmd') || command.startsWith('info') || command.startsWith('help') || command.startsWith('?')) {
     client.sendMessage(message.from, `Commands` 
-    + `\n.wiki _<text> wikipedia_`
+    + `\n.ebay _<text> ebay_`
     + `\n.translate _<text> translate_`
+    + `\n.wiki _<text> wikipedia_`
     + `\n.urban _<text> urban dictionairy_`
     + `\n.imdb _<text> IMDb_`
     + `\n.crypto _<token> crypto prices_`
@@ -169,7 +170,6 @@ client.on('message', async message => {
     + `\n.q _quiz_`
     + `\n.r _typeracer_`
     + `\n.casino _casino_`
-    + `\n.ebay _<text> ebay_`
     + `\n.ai _<text> ai question_`
     + `\n.img _<text> create image_`
     + `\n.mp3 _<link> yt -> .mp3_`
