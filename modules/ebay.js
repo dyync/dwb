@@ -137,7 +137,7 @@ async function ebay(item) {
     res_obj['status'] = 200
     res_obj['item'] = item
     res_obj['min_price'] = ebay_res_prices_filtered_arr[0].toFixed(2)
-    res_obj['max_price'] = ebay_res_prices_filtered_arr[-1].toFixed(2)
+    res_obj['max_price'] = ebay_res_prices_filtered_arr[ebay_res_prices_filtered_arr.length - 1].toFixed(2)
     res_obj['avg_price'] = ebay_res_prices_average_fixed
     res_obj['avg_price_filtered'] = ebay_res_prices_filtered_avg_fixed
     res_obj['tld'] = config_data["tld"]
