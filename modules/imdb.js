@@ -95,7 +95,7 @@ async function imdb(moviename) {
   const imdb_res = await imdb_info(imdb_res_titles[0]['href']);
   res_obj['status'] = 200
   res_obj['title'] = imdb_res_titles[0]['name']
-  res_obj['url'] = `https://www.imdb.com${imdb_res_titles[0]['href']}`
+  res_obj['url'] = `${imdb_res_titles[0]['href']}`
   res_obj['rating'] = imdb_res['rating']
   res_obj['text'] = imdb_res['text']
   return res_obj
