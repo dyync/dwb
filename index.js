@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const fs = require('fs')
 const os = require('os')
 const axios = require('axios')
-const translate = require('@vitalets/google-translate-api')
+const translate = require('@iamtraction/google-translate')
 const wetter = require('./modules/wetter')
 const mgdb_m = require('./modules/mgdb')
 const wiki = require('./modules/wiki')
@@ -355,20 +355,21 @@ client.on('message', async message => {
         message.body = `${message.body} ${quoted_message}`
       }
       let translate_msg_arr = message.body.toLowerCase().split(" ")
+      console.log(`translate_msg_arr: ${translate_msg_arr}`)
       if(translate_msg_arr.length <= 1) {
-        return client.sendMessage(message.from, "Use translate like this -> @tr <from-language> <to-language> <text>")          
+        return client.sendMessage(message.from, `Use translate like this -> .tr <from-language-code> <to-language-code> <text>`)          
       } else if(translate_msg_arr.length > 1 && translate_msg_arr.length <= 2) {
         if(!valid_langs.includes(translate_msg_arr[1])) {
           req_text = translate_msg_arr[1]
           translate(req_text, {to: default_lang}).then(res => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
-                client.sendMessage(message.from, "err translating")
+                client.sendMessage(message.from, `[translate] err: ${err}`)
             })
         } else if(valid_langs.includes(translate_msg_arr[1])) {
-          return client.sendMessage(message.from, `(1)Please enter text to translate to ${translate_msg_arr[1]}. \n\nUse translate like this -> \n@tr (<from-language> <to-language>) <text>`)
+          return client.sendMessage(message.from, `Enter text to translate to ${translate_msg_arr[1]}. \n\nUse translate like this -> \n.tr (<from-language-code> <to-language-code>) <text>`)
         } else {
-          return client.sendMessage(message.from, `err(1) translating. Check @cmds`)
+          return client.sendMessage(message.from, `err(1) translating. Check .cmds`)
         }
       } else if(translate_msg_arr.length > 2 && translate_msg_arr.length <= 3) {              
         if(!valid_langs.includes(translate_msg_arr[1])) {
@@ -377,12 +378,12 @@ client.on('message', async message => {
           translate(req_text, {to: default_lang}).then(res => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
-                client.sendMessage(message.from, "err(2) translating. Check @cmds")
+                client.sendMessage(message.from, `[translate] err: ${err}`)
             })
         }
         if(valid_langs.includes(translate_msg_arr[1])) {
           if(valid_langs.includes(translate_msg_arr[2])) {
-            return client.sendMessage(message.from, `(2)Please enter text to translate from ${translate_msg_arr[1]} to ${translate_msg_arr[2]}. \n\nUse translate like this -> \n@tr (<from-language> <to-language>) <text>`)
+            return client.sendMessage(message.from, `(2)Please enter text to translate from ${translate_msg_arr[1]} to ${translate_msg_arr[2]}. \n\nUse translate like this -> \n.tr (<from-language> <to-language>) <text>`)
           } else {
             if(translate_msg_arr[1] == default_lang) {
               translate_msg_split = translate_msg_arr.splice(2)
@@ -390,7 +391,7 @@ client.on('message', async message => {
               translate(req_text, {to: translate_msg_arr[1]}).then(res => {
                   client.sendMessage(message.from, res.text)
               }).catch(err => {
-                  client.sendMessage(message.from, "err(3) translating. Check @cmds")
+                  client.sendMessage(message.from, `[translate] err: ${err}`)
               })
             } else {
               translate_msg_split = translate_msg_arr.splice(2)
@@ -398,18 +399,19 @@ client.on('message', async message => {
               translate(req_text, {to: translate_msg_arr[1]}).then(res => {
                   client.sendMessage(message.from, res.text)
               }).catch(err => {
-                  client.sendMessage(message.from, "err(4) translating. Check @cmds")
+                  client.sendMessage(message.from, `[translate] err: ${err}`)
               })
             }
           }
         } else {
           client.sendMessage(message.from, `Translating in default language (${default_lang})`)
           translate_msg_split = translate_msg_arr.splice(1)
+          console.log(`translate_msg_split: ${translate_msg_split}`)
           req_text = translate_msg_split.join(' ')
           translate(req_text, {to: default_lang}).then(res => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
-                client.sendMessage(message.from, "err(5) translating. Check @cmds")
+                client.sendMessage(message.from, `[translate] err: ${err}`)
             })
         }
       }                    
@@ -421,7 +423,7 @@ client.on('message', async message => {
             translate(req_text, {from: translate_msg_arr[1], to: translate_msg_arr[2]}).then(res => {
                 client.sendMessage(message.from, res.text)
             }).catch(err => {
-                client.sendMessage(message.from, "err(6) translating. Check @cmds")
+                client.sendMessage(message.from, `[translate] err: ${err}`)
             })
           } else {  
               if(translate_msg_arr[1] == default_lang) { 
@@ -430,7 +432,7 @@ client.on('message', async message => {
                 translate(req_text, {to: translate_msg_arr[1]}).then(res => {
                     client.sendMessage(message.from, res.text)
                 }).catch(err => {
-                    client.sendMessage(message.from, "err(7) translating. Check @cmds")
+                    client.sendMessage(message.from, "err(7) translating. Check .cmds")
                 })
               } else {
                 translate_msg_split = translate_msg_arr.splice(2)
@@ -438,7 +440,7 @@ client.on('message', async message => {
                 translate(req_text, {to: translate_msg_arr[2]}).then(res => {
                     client.sendMessage(message.from, res.text)
                 }).catch(err => {
-                    client.sendMessage(message.from, "err(8) translating. Check @cmds")
+                    client.sendMessage(message.from, `[translate] err: ${err}`)
                 })
               }
           }              
@@ -448,11 +450,9 @@ client.on('message', async message => {
           translate(req_text, {to: default_lang}).then(res => {
               client.sendMessage(message.from, res.text)
           }).catch(err => {
-              client.sendMessage(message.from, "err(9) translating. Check @cmds")
+              client.sendMessage(message.from, `[translate] err: ${err}`)
           })
         }
-      } else {
-        client.sendMessage(message.from, "err(10) translating. Check @cmds")
       }
   }
 
